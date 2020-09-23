@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class HttpClient {
-    private int responseCode;
+    private final int responseCode;
 
     public HttpClient(String hostname, int port, String requestTarget) throws IOException {
 
@@ -14,6 +14,15 @@ public class HttpClient {
                 "Host: " + hostname + "\r\n\r\n";
         socket.getOutputStream().write(request.getBytes());
 
+        String line = readLine(socket);
+
+        System.out.println(line);
+        String[] responseLineParts = line.split(" ");
+        responseCode = Integer.parseInt(responseLineParts[1]);
+        
+    }
+
+    private String readLine(Socket socket) throws IOException {
         // Creating StringBuilder line to save the response
         StringBuilder line = new StringBuilder();
         int c;
@@ -26,11 +35,7 @@ public class HttpClient {
             // Adding char into line when its not '\n'
             line.append((char) c);
         }
-        
-        System.out.println(line);
-        String[] responeLineParts = line.toString().split(" ");
-        responseCode = Integer.parseInt(responeLineParts[1]);
-        
+        return line.toString();
     }
 
     public static void main(String[] args) throws IOException {
