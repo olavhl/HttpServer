@@ -4,19 +4,32 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class HttpClient {
+    private int responseCode;
+
     public HttpClient(String hostname, int port, String requestTarget) throws IOException {
 
         Socket socket = new Socket(hostname, port);
 
         String request = "GET " + requestTarget + " HTTP/1.1\r\n" +
                 "Host: " + hostname + "\r\n\r\n";
-
         socket.getOutputStream().write(request.getBytes());
 
+        // Creating StringBuilder line to save the response
+        StringBuilder line = new StringBuilder();
         int c;
         while ((c = socket.getInputStream().read()) != -1) {
-            System.out.print((char)c);
+
+            if (c == '\r') {
+                break;
+            }
+
+            // Adding char into line when its not '\n'
+            line.append((char) c);
         }
+        
+        System.out.println(line);
+        String[] responeLineParts = line.toString().split(" ");
+        responseCode = Integer.parseInt(responeLineParts[1]);
         
     }
 
@@ -25,11 +38,11 @@ public class HttpClient {
         int port = 80;
         String requestTarget = "/echo?status&body=Hello%20World!";
 
-        HttpClient httpClient = new HttpClient(hostname, port, requestTarget);
+        new HttpClient(hostname, port, requestTarget);
     }
 
     public int getResponseCode() {
 
-        return 200;
+        return responseCode;
     }
 }
