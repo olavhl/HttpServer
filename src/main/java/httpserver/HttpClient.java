@@ -45,6 +45,7 @@ public class HttpClient {
         while ((c = socket.getInputStream().read()) != -1) {
 
             if (c == '\r') {
+                socket.getInputStream().read();
                 break;
             }
 
