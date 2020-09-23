@@ -8,7 +8,7 @@ import java.util.Map;
 public class HttpClient {
     private final int responseCode;
 
-    private Map<String, String> responseHeaders = new HashMap<>();
+    private final Map<String, String> responseHeaders = new HashMap<>();
 
     public HttpClient(String hostname, int port, String requestTarget) throws IOException {
 
