@@ -2,9 +2,13 @@ package httpserver;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HttpClient {
     private final int responseCode;
+
+    private Map<String, String> responseHeaders = new HashMap<>();
 
     public HttpClient(String hostname, int port, String requestTarget) throws IOException {
 
@@ -19,7 +23,19 @@ public class HttpClient {
         System.out.println(line);
         String[] responseLineParts = line.split(" ");
         responseCode = Integer.parseInt(responseLineParts[1]);
-        
+
+        String headerLine;
+        while(!(headerLine = readLine(socket)).isEmpty()){
+            System.out.println(headerLine);
+
+            int colonPos = headerLine.indexOf(":");
+            String name = headerLine.substring(0, colonPos);
+            String value = headerLine.substring(colonPos+1).trim();
+            responseHeaders.put(name, value);
+
+        }
+
+
     }
 
     private String readLine(Socket socket) throws IOException {
@@ -49,5 +65,10 @@ public class HttpClient {
     public int getResponseCode() {
 
         return responseCode;
+    }
+
+    public String getResponseHeader(String headerName) {
+
+        return responseHeaders.get(headerName);
     }
 }
