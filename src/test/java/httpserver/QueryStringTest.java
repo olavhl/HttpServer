@@ -12,4 +12,13 @@ public class QueryStringTest {
         assertEquals("200", queryString.getParameter("status"));
     }
 
+    @Test
+    void shouldRetrieveMultipleParameters() {
+
+        QueryString queryString = new QueryString("body=Hello&status=200");
+        assertEquals("200", queryString.getParameter("status"));
+        assertEquals("Hello", queryString.getParameter("body"));
+    }
+    
+
 }
