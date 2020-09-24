@@ -35,7 +35,6 @@ public class HttpClient {
 
         }
 
-
     }
 
     private String readLine(Socket socket) throws IOException {
@@ -49,7 +48,7 @@ public class HttpClient {
                 break;
             }
 
-            // Adding char into line when its not '\n'
+            // Adding char into line when it's not '\n'
             line.append((char) c);
         }
         return line.toString();
