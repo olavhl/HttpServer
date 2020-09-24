@@ -6,11 +6,30 @@ import java.net.Socket;
 
 public class HttpServer {
 
+
+    public HttpServer(int port) throws IOException {
+
+        ServerSocket serverSocket = new ServerSocket(port);
+
+        new Thread(() -> {
+         try {
+             Socket socket = serverSocket.accept();
+             handleRequest(socket);
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
+        }).start();
+
+    }
+
     public static void main(String[] args) throws IOException {
 
-        ServerSocket serverSocket = new ServerSocket(8080);
 
-        Socket socket = serverSocket.accept();
+    }
+
+    private static void handleRequest(Socket socket) throws IOException {
+        String responseLine = HttpClient.readLine(socket);
+        System.out.println(responseLine);
 
         String response = "HTTP/1.1 200 OK\r\n" +
                 "Content-Type: text/html; charset=utf-8\r\n" +
@@ -19,6 +38,5 @@ public class HttpServer {
                 "Kristiania";
 
         socket.getOutputStream().write(response.getBytes());
-
     }
 }
