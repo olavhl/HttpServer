@@ -24,14 +24,26 @@ public class HttpServer {
 
     public static void main(String[] args) throws IOException {
 
+        new HttpServer(8080);
 
     }
 
     private static void handleRequest(Socket socket) throws IOException {
-        String responseLine = HttpClient.readLine(socket);
-        System.out.println(responseLine);
+        String statusCode = "200";
+        String requestLine = HttpClient.readLine(socket);
+        System.out.println(requestLine);
 
-        String response = "HTTP/1.1 200 OK\r\n" +
+        String requestTarget = requestLine.split(" ")[1];
+        int questionPos = requestTarget.indexOf("?");
+        if(questionPos != -1){
+            String queryString = requestTarget.substring(questionPos+1);
+            int equalsPos = queryString.indexOf("=");
+            String parameterValue = queryString.substring(equalsPos+1);
+            statusCode = parameterValue;
+        }
+
+
+        String response = "HTTP/1.1 " + statusCode + " OK\r\n" +
                 "Content-Type: text/html; charset=utf-8\r\n" +
                 "Content-Length: 10\r\n" +
                 "\r\n" +
