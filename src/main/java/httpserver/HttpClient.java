@@ -22,14 +22,12 @@ public class HttpClient {
 
         String line = readLine(socket);
 
-        System.out.println(line);
         String[] responseLineParts = line.split(" ");
 
         statusCode = Integer.parseInt(responseLineParts[1]);
 
         String headerLine;
         while (!(headerLine = readLine(socket)).isEmpty()) {
-            System.out.println(headerLine);
 
             int colonPos = headerLine.indexOf(":");
             String name = headerLine.substring(0, colonPos);

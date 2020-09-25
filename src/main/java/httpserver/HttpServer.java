@@ -27,7 +27,8 @@ public class HttpServer {
 
     public static void main(String[] args) throws IOException {
 
-        new HttpServer(8080);
+        HttpServer server = new HttpServer(8080);
+        server.setDocumentRoot(new File("src/main/resources"));
 
     }
 
@@ -42,15 +43,22 @@ public class HttpServer {
         if(questionPos != -1) {
 
             QueryString queryString = new QueryString(requestTarget.substring(questionPos + 1));
-
             statusCode = queryString.getParameter("status");
+
             if(statusCode == null) statusCode = "200";
             body = queryString.getParameter("body");
+
         }else if(!requestTarget.equals("/echo")){
             File targetFile = new File(documentRoot, requestTarget);
-            String responseHeaders = "HTTP/1.1 " + statusCode + " OK\r\n" +
+
+            if (!targetFile.exists()){
+                writeResponse(clientSocket, "404", requestTarget + " not found");
+
+                return;
+            }
+            String responseHeaders = "HTTP/1.1 200 OK\r\n" +
                     "Content-Length: " + targetFile.length() + "\r\n" +
-                    "Content-Type: text/plain\r\n" +
+                    "Content-Type: text/html\r\n" +
                     "\r\n";;
 
             clientSocket.getOutputStream().write(responseHeaders.getBytes());
