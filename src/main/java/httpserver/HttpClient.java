@@ -6,9 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpClient {
-    private final int statusCode;
 
+    private final int statusCode;
     private Map<String, String> responseHeaders = new HashMap<>();
+
 
     public HttpClient(String hostname, int port, String requestTarget) throws IOException {
 
@@ -22,6 +23,7 @@ public class HttpClient {
 
         System.out.println(line);
         String[] responseLineParts = line.split(" ");
+
         statusCode = Integer.parseInt(responseLineParts[1]);
 
         String headerLine;
@@ -33,11 +35,14 @@ public class HttpClient {
             String value = headerLine.substring(colonPos+1).trim();
             responseHeaders.put(name, value);
 
+
         }
 
     }
 
-    public static String readLine(Socket socket) throws IOException {
+  
+    private String readLine(Socket socket) throws IOException {
+
         // Creating StringBuilder line to save the response
         StringBuilder line = new StringBuilder();
         int c;
@@ -47,6 +52,7 @@ public class HttpClient {
                 socket.getInputStream().read();
                 break;
             }
+
 
             // Adding char into line when it's not '\n'
             line.append((char) c);
@@ -62,6 +68,7 @@ public class HttpClient {
         new HttpClient(hostname, port, requestTarget);
     }
 
+
     public int getStatusCode() {
         return statusCode;
     }
@@ -69,4 +76,9 @@ public class HttpClient {
     public String getResponseHeader(String headerName) {
         return responseHeaders.get(headerName);
     }
-}
+
+
+    public String getResponseBody() {
+        return responseBody;
+    }
+

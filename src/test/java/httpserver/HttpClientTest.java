@@ -19,10 +19,14 @@ public class HttpClientTest {
     }
 
     @Test
-
     void shouldReadHeaders() throws IOException {
         HttpClient httpClient = makeEchoRequest("/echo?body=Kristiania");
         assertEquals("10", httpClient.getResponseHeader("Content-Length"));
     }
 
+    @Test
+    void shouldReadBody() throws IOException {
+        HttpClient httpClient = makeEchoRequest("/echo?body=HelloWorld");
+        assertEquals("HelloWorld", httpClient.getResponseBody());
+    }
 }
