@@ -1,4 +1,4 @@
-package httpserver;
+package no.kristiania.http;
 
 import java.io.File;
 import java.io.FileInputStream;
