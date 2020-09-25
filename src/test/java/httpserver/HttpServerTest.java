@@ -47,8 +47,8 @@ class HttpServerTest {
         server.setDocumentRoot(documentRoot);
         String fileContent = "Hello " + new Date();
         Files.writeString(new File(documentRoot, "index.html").toPath(), fileContent);
-        HttpClient client = new HttpClient("localhost", 10005, "/echo?body=HelloWorld");
-        assertEquals("10", client.getResponseBody());
+        HttpClient client = new HttpClient("localhost", 10005, "/index.html");
+        assertEquals(fileContent, client.getResponseBody());
     }
 
 }
