@@ -8,6 +8,7 @@ import java.util.Map;
 public class HttpClient {
 
     private final int statusCode;
+    private final String responseBody;
     private Map<String, String> responseHeaders = new HashMap<>();
 
 
@@ -27,21 +28,28 @@ public class HttpClient {
         statusCode = Integer.parseInt(responseLineParts[1]);
 
         String headerLine;
-        while(!(headerLine = readLine(socket)).isEmpty()){
+        while (!(headerLine = readLine(socket)).isEmpty()) {
             System.out.println(headerLine);
 
             int colonPos = headerLine.indexOf(":");
             String name = headerLine.substring(0, colonPos);
-            String value = headerLine.substring(colonPos+1).trim();
+            String value = headerLine.substring(colonPos + 1).trim();
             responseHeaders.put(name, value);
 
 
         }
 
+        int contentLength = Integer.parseInt(getResponseHeader("Content-Length"));
+        StringBuilder body = new StringBuilder();
+        for (int i = 0; i < contentLength; i++) {
+            body.append((char) socket.getInputStream().read());
+        }
+        responseBody = body.toString();
+
     }
 
-  
-    private String readLine(Socket socket) throws IOException {
+
+    public static String readLine(Socket socket) throws IOException {
 
         // Creating StringBuilder line to save the response
         StringBuilder line = new StringBuilder();
@@ -81,4 +89,5 @@ public class HttpClient {
     public String getResponseBody() {
         return responseBody;
     }
+}
 
