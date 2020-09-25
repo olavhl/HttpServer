@@ -30,17 +30,23 @@ public class HttpServer {
 
     private static void handleRequest(Socket socket) throws IOException {
         String statusCode = "200";
+        String body = null;
         String requestLine = HttpClient.readLine(socket);
         System.out.println(requestLine);
 
         String requestTarget = requestLine.split(" ")[1];
         int questionPos = requestTarget.indexOf("?");
-        if(questionPos != -1){
-            String queryString = requestTarget.substring(questionPos+1);
-            int equalsPos = queryString.indexOf("=");
-            String parameterValue = queryString.substring(equalsPos+1);
-            statusCode = parameterValue;
+        if(questionPos != -1) {
+
+            QueryString queryString = new QueryString(requestTarget.substring(questionPos + 1));
+
+            statusCode = queryString.getParameter("status");
+            if(statusCode == null) statusCode = "200";
+            body = queryString.getParameter("body");
         }
+
+        if(body == null) body = "Hello <strong>World</strong>";
+
 
 
         String response = "HTTP/1.1 " + statusCode + " OK\r\n" +

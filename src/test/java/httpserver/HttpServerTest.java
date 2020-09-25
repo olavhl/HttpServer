@@ -22,6 +22,11 @@ class HttpServerTest {
         assertEquals(404, client.getStatusCode());
     }
 
-
+    @Test
+    void shouldReturnHttpHeaders() throws IOException {
+        HttpServer server = new HttpServer(10003);
+        HttpClient client = new HttpClient("localhost", 10003, "/echo?body=HelloWorld");
+        assertEquals("10", client.getResponseHeader("Content-Length"));
+    }
 
 }
