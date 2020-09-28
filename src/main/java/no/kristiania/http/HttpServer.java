@@ -80,13 +80,12 @@ public class HttpServer {
     }
 
     private static void writeResponse(Socket clientSocket, String statusCode, String body) throws IOException {
-        String response = "HTTP/1.1 " + statusCode + " OK\r\n" +
-                "Content-Length: " + body.length() +"\r\n" +
-                "Content-Type: text/html; charset=utf-8\r\n" +
-                "\r\n" +
-                body;
 
-        clientSocket.getOutputStream().write(response.getBytes());
+        HttpMessage responseMessage = new HttpMessage("HTTP/1.1 " + statusCode + " OK");
+        responseMessage.setHeader("Content-Length", String.valueOf(body.length()));
+        responseMessage.setHeader("Content-Type", "text/plain");
+        responseMessage.write(clientSocket);
+        clientSocket.getOutputStream().write(body.getBytes());
     }
 
     public void setDocumentRoot(File documentRoot) {
