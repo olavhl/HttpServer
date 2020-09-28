@@ -5,7 +5,7 @@ import java.net.Socket;
 
 public class HttpClient {
 
-    private final String responseBody;
+    private String responseBody;
     private final HttpMessage responseMessage;
 
 
@@ -28,6 +28,17 @@ public class HttpClient {
         }
         responseBody = body.toString();
 
+    }
+
+    public HttpClient(String hostname, int port, String requestTarget, String method, QueryString form) throws IOException {
+
+        Socket socket = new Socket(hostname, port);
+
+        HttpMessage requestMessage = new HttpMessage("GET " + requestTarget + " HTTP/1.1");
+        requestMessage.setHeader("Host", hostname);
+        requestMessage.write(socket);
+
+        responseMessage = HttpMessage.read(socket);
     }
 
 

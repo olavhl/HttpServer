@@ -8,7 +8,7 @@ public class QueryString {
     private final Map<String, String> parameters = new HashMap<>();
 
     public QueryString(String queryString) {
-
+        if (queryString.isEmpty()) return;
         for(String parameter : queryString.split("&")){
             int equalsPos = parameter.indexOf("=");
             String value = parameter.substring(equalsPos + 1);
@@ -21,5 +21,9 @@ public class QueryString {
 
     public String getParameter(String name) {
         return parameters.get(name);
+    }
+
+    public void addParameter(String name, String value) {
+        parameters.put(name, value);
     }
 }

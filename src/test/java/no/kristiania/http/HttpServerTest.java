@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,7 +33,6 @@ class HttpServerTest {
         assertEquals("10", client.getResponseHeader("Content-Length"));
     }
 
-    //Work
     @Test
     void shouldReturnResponseBody() throws IOException {
         new HttpServer(10004);
@@ -69,6 +69,14 @@ class HttpServerTest {
         assertEquals("text/plain", client.getResponseHeader("Content-Type"));
     }
 
-
+    @Test
+    void shouldPostMember() throws IOException {
+        HttpServer server = new HttpServer(10008);
+        QueryString member = new QueryString("");
+        member.addParameter("name", "Ola Normann");
+        member.addParameter("email", "ola@nordmann.no");
+        new HttpClient("localhost", 10008, "/addMember", "POST", member);
+        assertEquals(List.of("Ola Normann"), server.getMemberNames());
+    }
 
 }

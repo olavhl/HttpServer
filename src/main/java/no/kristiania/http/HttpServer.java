@@ -5,10 +5,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HttpServer {
 
     private static File documentRoot;
+    private final List<String> memberNames = new ArrayList<>();
 
     public HttpServer(int port) throws IOException {
 
@@ -30,17 +33,19 @@ public class HttpServer {
     public static void main(String[] args) throws IOException {
 
         HttpServer server = new HttpServer(8080);
-        server.setDocumentRoot(new File("src/main/resources"));
+        server.setDocumentRoot(new File("src/main/resources/"));
 
     }
 
     private static void handleRequest(Socket clientSocket) throws IOException {
-        String statusCode = "200";
-        String body = null;
+
         String requestLine = HttpMessage.readLine(clientSocket);
         System.out.println(requestLine);
 
         String requestTarget = requestLine.split(" ")[1];
+        String statusCode = null;
+        String body = null;
+
         int questionPos = requestTarget.indexOf("?");
         if(questionPos != -1) {
 
@@ -92,5 +97,9 @@ public class HttpServer {
 
     public void setDocumentRoot(File documentRoot) {
         HttpServer.documentRoot = documentRoot;
+    }
+
+    public List<String> getMemberNames() {
+        return memberNames;
     }
 }
