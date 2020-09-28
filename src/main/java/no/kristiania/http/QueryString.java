@@ -26,4 +26,15 @@ public class QueryString {
     public void addParameter(String name, String value) {
         parameters.put(name, value);
     }
+
+    public String getQueryString() {
+        StringBuilder result = new StringBuilder();
+        for (Map.Entry<String, String> parameter : parameters.entrySet()) {
+            if (result.length() > 0) {
+                result.append("&");
+            }
+            result.append(parameter.getKey()).append("=").append(parameter.getValue());
+        }
+        return "?" + result.toString();
+    }
 }

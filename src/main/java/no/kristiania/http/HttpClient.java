@@ -5,7 +5,7 @@ import java.net.Socket;
 
 public class HttpClient {
 
-    private String responseBody;
+    private final String responseBody;
     private final HttpMessage responseMessage;
 
 
@@ -18,15 +18,7 @@ public class HttpClient {
         requestMessage.write(socket);
 
         responseMessage = HttpMessage.read(socket);
-
-
-
-        int contentLength = Integer.parseInt(getResponseHeader("Content-Length"));
-        StringBuilder body = new StringBuilder();
-        for (int i = 0; i < contentLength; i++) {
-            body.append((char) socket.getInputStream().read());
-        }
-        responseBody = body.toString();
+        responseBody = responseMessage.readBody(socket);
 
     }
 
@@ -34,13 +26,16 @@ public class HttpClient {
 
         Socket socket = new Socket(hostname, port);
 
-        HttpMessage requestMessage = new HttpMessage("GET " + requestTarget + " HTTP/1.1");
+        String requestBody = form.getQueryString();
+
+        HttpMessage requestMessage = new HttpMessage(method + " " + requestTarget + " HTTP/1.1");
         requestMessage.setHeader("Host", hostname);
         requestMessage.write(socket);
+        socket.getOutputStream().write(requestBody.getBytes());
 
         responseMessage = HttpMessage.read(socket);
+        responseBody = responseMessage.readBody(socket);
     }
-
 
     public static void main(String[] args) throws IOException {
         String hostname = "urlecho.appspot.com";
@@ -53,8 +48,7 @@ public class HttpClient {
 
     public int getStatusCode() {
         String[] responseLineParts = responseMessage.getStartLine().split(" ");
-        int statusCode = Integer.parseInt(responseLineParts[1]);
-        return statusCode;
+        return Integer.parseInt(responseLineParts[1]);
     }
 
     public String getResponseHeader(String headerName) {

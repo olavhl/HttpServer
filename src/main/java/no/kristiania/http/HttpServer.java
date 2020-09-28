@@ -11,7 +11,7 @@ import java.util.List;
 public class HttpServer {
 
     private static File documentRoot;
-    private final List<String> memberNames = new ArrayList<>();
+    private static final List<String> memberNames = new ArrayList<>();
 
     public HttpServer(int port) throws IOException {
 
@@ -42,8 +42,24 @@ public class HttpServer {
         String requestLine = HttpMessage.readLine(clientSocket);
         System.out.println(requestLine);
 
-        String requestTarget = requestLine.split(" ")[1];
-        String statusCode = null;
+       String requestMethod = requestLine.split(" ")[0];
+       String requestTarget = requestLine.split(" ")[1];
+
+       if (requestMethod.equals("POST")){
+           HttpMessage requestMessage = new HttpMessage(requestLine);
+           requestMessage.readHeaders(clientSocket);
+           QueryString requestForm = new QueryString(requestMessage.readBody(clientSocket));
+           memberNames.add(requestForm.getParameter("name"));
+
+
+           HttpMessage responseMessage = new HttpMessage("HTTP/1.1 200 OK");
+           responseMessage.write(clientSocket);
+           return;
+       }
+
+
+
+        String statusCode = "200";
         String body = null;
 
         int questionPos = requestTarget.indexOf("?");
