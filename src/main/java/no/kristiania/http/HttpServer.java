@@ -1,4 +1,4 @@
-package httpserver;
+package no.kristiania.http;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,7 +35,7 @@ public class HttpServer {
     private static void handleRequest(Socket clientSocket) throws IOException {
         String statusCode = "200";
         String body = null;
-        String requestLine = HttpClient.readLine(clientSocket);
+        String requestLine = HttpMessage.readLine(clientSocket);
         System.out.println(requestLine);
 
         String requestTarget = requestLine.split(" ")[1];
@@ -56,22 +56,20 @@ public class HttpServer {
 
                 return;
             }
-            String contentType = "text/html";
-            if(targetFile.getName().endsWith(".txt")){
-                contentType="text/plain";
+
+            HttpMessage responseMessage = new HttpMessage("HTTP/1.1 200 OK");
+            responseMessage.setHeader("Content-Length", String.valueOf(targetFile.length()));
+            responseMessage.setHeader("Content-type", "text/html");
+
+            if(targetFile.getName().endsWith(".txt")) {
+                responseMessage.setHeader("Content-Type", "text/plain");
             }
 
-            String responseHeaders = "HTTP/1.1 200 OK\r\n" +
-                    "Content-Length: " + targetFile.length() + "\r\n" +
-                    "Content-Type: " + contentType + "\r\n" +
-                    "\r\n";;
+            responseMessage.write(clientSocket);
 
-            clientSocket.getOutputStream().write(responseHeaders.getBytes());
             try(FileInputStream inputStream = new FileInputStream(targetFile)){
                 inputStream.transferTo(clientSocket.getOutputStream());
             }
-
-
 
         }
 
@@ -82,13 +80,12 @@ public class HttpServer {
     }
 
     private static void writeResponse(Socket clientSocket, String statusCode, String body) throws IOException {
-        String response = "HTTP/1.1 " + statusCode + " OK\r\n" +
-                "Content-Length: " + body.length() +"\r\n" +
-                "Content-Type: text/html; charset=utf-8\r\n" +
-                "\r\n" +
-                body;
 
-        clientSocket.getOutputStream().write(response.getBytes());
+        HttpMessage responseMessage = new HttpMessage("HTTP/1.1 " + statusCode + " OK");
+        responseMessage.setHeader("Content-Length", String.valueOf(body.length()));
+        responseMessage.setHeader("Content-Type", "text/plain");
+        responseMessage.write(clientSocket);
+        clientSocket.getOutputStream().write(body.getBytes());
     }
 
     public void setDocumentRoot(File documentRoot) {

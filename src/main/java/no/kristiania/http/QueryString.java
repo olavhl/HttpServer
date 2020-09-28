@@ -1,4 +1,4 @@
-package httpserver;
+package no.kristiania.http;
 
 import java.util.HashMap;
 import java.util.Map;
