@@ -14,15 +14,21 @@ public class HttpMessage {
         this.startLine = startLine;
     }
 
-    public void setHeader(String name, String value){
-         headers.put(name, value);
+    public void setHeader(String name, String value) {
+        headers.put(name, value);
     }
 
     public void write(Socket socket) throws IOException {
-        socket.getOutputStream().write((startLine + "\r\n").getBytes());
-        for (Map.Entry<String, String> header: headers.entrySet()){
-            socket.getOutputStream().write((header.getKey() + ": " + header.getValue() + "\r\n").getBytes());
+        writeLine(socket, startLine);
+        for (Map.Entry<String, String> header : headers.entrySet()) {
+            writeLine(socket, header.getKey() + ": " + header.getValue());
         }
-        socket.getOutputStream().write("\r\n".getBytes());
+        writeLine(socket, "");
+    }
+
+
+
+    private void writeLine(Socket socket, String startLine) throws IOException {
+        socket.getOutputStream().write((startLine + "\r\n").getBytes());
     }
 }
