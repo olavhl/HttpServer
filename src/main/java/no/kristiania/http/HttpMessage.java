@@ -26,7 +26,6 @@ public class HttpMessage {
                 break;
             }
 
-
             // Adding char into line when it's not '\n'
             line.append((char) c);
         }

@@ -16,8 +16,10 @@ public class HttpServer {
 
         new Thread(() -> {
          try {
-             Socket clientSocket = serverSocket.accept();
-             handleRequest(clientSocket);
+             while (true) {
+                 Socket clientSocket = serverSocket.accept();
+                 handleRequest(clientSocket);
+             }
          } catch (IOException e) {
              e.printStackTrace();
          }
@@ -89,6 +91,6 @@ public class HttpServer {
     }
 
     public void setDocumentRoot(File documentRoot) {
-        this.documentRoot = documentRoot;
+        HttpServer.documentRoot = documentRoot;
     }
 }
