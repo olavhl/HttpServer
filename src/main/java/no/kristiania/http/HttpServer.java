@@ -57,7 +57,7 @@ public class HttpServer {
                 return;
             }
 
-            HttpMessage responseMessage = new HttpMessage("HTTP1.1 200 OK");
+            HttpMessage responseMessage = new HttpMessage("HTTP/1.1 200 OK");
             responseMessage.setHeader("Content-Length", String.valueOf(targetFile.length()));
             responseMessage.setHeader("Content-type", "text/html");
 
