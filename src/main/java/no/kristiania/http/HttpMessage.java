@@ -1,7 +1,5 @@
 package no.kristiania.http;
 
-import com.sun.net.httpserver.HttpPrincipal;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
