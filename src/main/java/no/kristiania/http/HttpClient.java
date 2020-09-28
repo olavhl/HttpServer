@@ -7,9 +7,8 @@ import java.util.Map;
 
 public class HttpClient {
 
-    private final int statusCode;
     private final String responseBody;
-    private Map<String, String> responseHeaders = new HashMap<>();
+    private final HttpMessage responseMessage;
 
 
     public HttpClient(String hostname, int port, String requestTarget) throws IOException {
@@ -20,23 +19,9 @@ public class HttpClient {
         requestMessage.setHeader("Host", hostname);
         requestMessage.write(socket);
 
-
-        String line = readLine(socket);
-
-        String[] responseLineParts = line.split(" ");
-
-        statusCode = Integer.parseInt(responseLineParts[1]);
-
-        String headerLine;
-        while (!(headerLine = readLine(socket)).isEmpty()) {
-
-            int colonPos = headerLine.indexOf(":");
-            String name = headerLine.substring(0, colonPos);
-            String value = headerLine.substring(colonPos + 1).trim();
-            responseHeaders.put(name, value);
+        responseMessage = HttpMessage.read(socket);
 
 
-        }
 
         int contentLength = Integer.parseInt(getResponseHeader("Content-Length"));
         StringBuilder body = new StringBuilder();
@@ -48,25 +33,6 @@ public class HttpClient {
     }
 
 
-    public static String readLine(Socket socket) throws IOException {
-
-        // Creating StringBuilder line to save the response
-        StringBuilder line = new StringBuilder();
-        int c;
-        while ((c = socket.getInputStream().read()) != -1) {
-
-            if (c == '\r') {
-                socket.getInputStream().read();
-                break;
-            }
-
-
-            // Adding char into line when it's not '\n'
-            line.append((char) c);
-        }
-        return line.toString();
-    }
-
     public static void main(String[] args) throws IOException {
         String hostname = "urlecho.appspot.com";
         int port = 80;
@@ -77,11 +43,13 @@ public class HttpClient {
 
 
     public int getStatusCode() {
+        String[] responseLineParts = responseMessage.getStartLine().split(" ");
+        int statusCode = Integer.parseInt(responseLineParts[1]);
         return statusCode;
     }
 
     public String getResponseHeader(String headerName) {
-        return responseHeaders.get(headerName);
+        return responseMessage.getHeader(headerName);
     }
 
 
