@@ -56,22 +56,20 @@ public class HttpServer {
 
                 return;
             }
-            String contentType = "text/html";
-            if(targetFile.getName().endsWith(".txt")){
-                contentType="text/plain";
+
+            HttpMessage responseMessage = new HttpMessage("HTTP1.1 200 OK");
+            responseMessage.setHeader("Content-Length", String.valueOf(targetFile.length()));
+            responseMessage.setHeader("Content-type", "text/html");
+
+            if(targetFile.getName().endsWith(".txt")) {
+                responseMessage.setHeader("Content-Type", "text/plain");
             }
 
-            String responseHeaders = "HTTP/1.1 200 OK\r\n" +
-                    "Content-Length: " + targetFile.length() + "\r\n" +
-                    "Content-Type: " + contentType + "\r\n" +
-                    "\r\n";;
+            responseMessage.write(clientSocket);
 
-            clientSocket.getOutputStream().write(responseHeaders.getBytes());
             try(FileInputStream inputStream = new FileInputStream(targetFile)){
                 inputStream.transferTo(clientSocket.getOutputStream());
             }
-
-
 
         }
 
