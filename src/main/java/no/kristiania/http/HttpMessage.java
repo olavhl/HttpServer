@@ -15,17 +15,14 @@ public class HttpMessage {
     }
 
     public static String readLine(Socket socket) throws IOException {
-
         // Creating StringBuilder line to save the response
         StringBuilder line = new StringBuilder();
         int c;
         while ((c = socket.getInputStream().read()) != -1) {
-
             if (c == '\r') {
                 socket.getInputStream().read();
                 break;
             }
-
             // Adding char into line when it's not '\n'
             line.append((char) c);
         }
@@ -33,7 +30,7 @@ public class HttpMessage {
     }
 
     public static HttpMessage read(Socket socket) throws IOException {
-        HttpMessage message = new HttpMessage((readLine(socket)));
+        HttpMessage message = new HttpMessage(readLine(socket));
         message.readHeaders(socket);
         return message;
     }
@@ -64,11 +61,11 @@ public class HttpMessage {
         String headerLine;
         while (!(headerLine = HttpMessage.readLine(socket)).isEmpty()) {
 
-            int colonPos = headerLine.indexOf(":");
-            String name = headerLine.substring(0, colonPos);
-            String value = headerLine.substring(colonPos + 1).trim();
+            int colonPos = headerLine.indexOf(':');
+            String headerName = headerLine.substring(0, colonPos);
+            String headerValue = headerLine.substring(colonPos + 1).trim();
 
-            setHeader(name, value);
+            setHeader(headerName, headerValue);
         }
     }
 
@@ -77,6 +74,7 @@ public class HttpMessage {
     }
 
     public String readBody(Socket socket) throws IOException {
+        System.out.println(getHeader("Content-Length"));
         int contentLength = Integer.parseInt(getHeader("Content-Length"));
         StringBuilder body = new StringBuilder();
         for (int i = 0; i < contentLength; i++){

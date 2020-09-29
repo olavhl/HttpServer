@@ -11,9 +11,9 @@ public class QueryString {
         if (queryString.isEmpty()) return;
         for(String parameter : queryString.split("&")){
             int equalsPos = parameter.indexOf("=");
+            String key = parameter.substring(0, equalsPos);
             String value = parameter.substring(equalsPos + 1);
-            String parameterName = parameter.substring(0, equalsPos);
-            parameters.put(parameterName, value);
+            parameters.put(key, value);
         }
 
 
@@ -35,6 +35,6 @@ public class QueryString {
             }
             result.append(parameter.getKey()).append("=").append(parameter.getValue());
         }
-        return "?" + result.toString();
+        return result.toString();
     }
 }

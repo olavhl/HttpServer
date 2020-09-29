@@ -30,6 +30,7 @@ public class HttpClient {
 
         HttpMessage requestMessage = new HttpMessage(method + " " + requestTarget + " HTTP/1.1");
         requestMessage.setHeader("Host", hostname);
+        requestMessage.setHeader("Content-Length", String.valueOf(requestBody.length()));
         requestMessage.write(socket);
         socket.getOutputStream().write(requestBody.getBytes());
 
@@ -51,13 +52,9 @@ public class HttpClient {
         return Integer.parseInt(responseLineParts[1]);
     }
 
-    public String getResponseHeader(String headerName) {
-        return responseMessage.getHeader(headerName);
-    }
+    public String getResponseHeader(String headerName) { return responseMessage.getHeader(headerName); }
 
 
-    public String getResponseBody() {
-        return responseBody;
-    }
+    public String getResponseBody() { return responseBody; }
 }
 

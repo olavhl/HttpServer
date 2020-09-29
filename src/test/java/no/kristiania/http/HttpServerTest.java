@@ -73,7 +73,7 @@ class HttpServerTest {
     void shouldPostMember() throws IOException {
         HttpServer server = new HttpServer(10009);
         QueryString member = new QueryString("");
-        member.addParameter("name", "Ola Normann");
+        member.addParameter("memberName", "Ola Normann");
         member.addParameter("email", "ola@nordmann.no");
         new HttpClient("localhost", 10009, "/addMember", "POST", member);
         assertEquals(List.of("Ola Normann"), server.getMemberNames());

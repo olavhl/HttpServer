@@ -18,14 +18,14 @@ public class HttpServer {
         ServerSocket serverSocket = new ServerSocket(port);
 
         new Thread(() -> {
-         try {
              while (true) {
-                 Socket clientSocket = serverSocket.accept();
-                 handleRequest(clientSocket);
+                try {
+                      Socket clientSocket = serverSocket.accept();
+                      handleRequest(clientSocket);
+                } catch (IOException e) {
+                        e.printStackTrace();
+                }
              }
-         } catch (IOException e) {
-             e.printStackTrace();
-         }
         }).start();
 
     }
@@ -49,7 +49,7 @@ public class HttpServer {
            HttpMessage requestMessage = new HttpMessage(requestLine);
            requestMessage.readHeaders(clientSocket);
            QueryString requestForm = new QueryString(requestMessage.readBody(clientSocket));
-           memberNames.add(requestForm.getParameter("name"));
+           memberNames.add(requestForm.getParameter("memberName"));
 
 
            HttpMessage responseMessage = new HttpMessage("HTTP/1.1 200 OK");
