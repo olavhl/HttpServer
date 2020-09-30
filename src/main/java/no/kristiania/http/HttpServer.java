@@ -33,7 +33,7 @@ public class HttpServer {
     public static void main(String[] args) throws IOException {
 
         HttpServer server = new HttpServer(8080);
-        server.setDocumentRoot(new File("src/main/resources/index.html"));
+        server.setDocumentRoot(new File("src/main/resources/"));
 
     }
 
@@ -80,13 +80,19 @@ public class HttpServer {
                 return;
             }
 
+            String contentType = "text/html";
+
+            if ( targetFile.getName().endsWith(".css")){
+                contentType = "text/css";
+            } else if(targetFile.getName().endsWith(".txt")) {
+                contentType = "text/plain";
+            }
+
             HttpMessage responseMessage = new HttpMessage("HTTP/1.1 200 OK");
             responseMessage.setHeader("Content-Length", String.valueOf(targetFile.length()));
-            responseMessage.setHeader("Content-type", "text/html");
+            responseMessage.setHeader("Content-type", contentType);
 
-            if(targetFile.getName().endsWith(".txt")) {
-                responseMessage.setHeader("Content-Type", "text/plain");
-            }
+
 
             responseMessage.write(clientSocket);
 
