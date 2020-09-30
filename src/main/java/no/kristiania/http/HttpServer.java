@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,11 +76,20 @@ public class HttpServer {
         }else if(!requestTarget.equals("/echo")){
             File targetFile = new File(documentRoot, requestTarget);
 
-            if (!targetFile.exists()){
+
+            if (requestTarget.equals("/projectMembers")) {
+                Path plain = Path.of("src/main/resources/plain.txt");
+                body = Files.readString(plain);
+
+                writeResponse(clientSocket, statusCode, body);
+
+                return;
+            } else if (!targetFile.exists()){
                 writeResponse(clientSocket, "404", requestTarget + " not found");
 
                 return;
             }
+
 
             // Code to accept css as a filetype in the response
             String contentType = "text/html";
@@ -102,7 +113,7 @@ public class HttpServer {
 
         }
 
-        if(body == null) body = "Hello <strong>World</strong>";
+        if(body == null) body = "Well, this didnt work....";
 
 
         writeResponse(clientSocket, statusCode, body);
