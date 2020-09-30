@@ -30,8 +30,4 @@ public class HttpClientTest {
         assertEquals("HelloWorld", httpClient.getResponseBody());
     }
 
-
-
-
-
 }
