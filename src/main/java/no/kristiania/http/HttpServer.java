@@ -80,8 +80,8 @@ public class HttpServer {
                 return;
             }
 
+            // Code to accept css as a filetype in the response
             String contentType = "text/html";
-
             if ( targetFile.getName().endsWith(".css")){
                 contentType = "text/css";
             } else if(targetFile.getName().endsWith(".txt")) {
@@ -90,7 +90,7 @@ public class HttpServer {
 
             HttpMessage responseMessage = new HttpMessage("HTTP/1.1 200 OK");
             responseMessage.setHeader("Content-Length", String.valueOf(targetFile.length()));
-            responseMessage.setHeader("Content-type", contentType);
+            responseMessage.setHeader("Content-Type", contentType);
 
 
 
