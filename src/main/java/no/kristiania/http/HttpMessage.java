@@ -74,8 +74,12 @@ public class HttpMessage {
     }
 
     public String readBody(Socket socket) throws IOException {
-        System.out.println(getHeader("Content-Length"));
-        int contentLength = Integer.parseInt(getHeader("Content-Length"));
+        int contentLength;
+        if (getHeader("Content-Length") != null) {
+            contentLength = Integer.parseInt(getHeader("Content-Length"));
+        } else {
+            contentLength = 0;
+        }
         StringBuilder body = new StringBuilder();
         for (int i = 0; i < contentLength; i++){
             body.append((char)socket.getInputStream().read());

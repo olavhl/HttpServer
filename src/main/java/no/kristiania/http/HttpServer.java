@@ -33,7 +33,7 @@ public class HttpServer {
     public static void main(String[] args) throws IOException {
 
         HttpServer server = new HttpServer(8080);
-        server.setDocumentRoot(new File("src/main/resources/"));
+        server.setDocumentRoot(new File("src/main/resources/index.html"));
 
     }
 
