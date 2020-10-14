@@ -44,7 +44,7 @@ class HttpServerTest {
     void shouldReturnFileContent() throws IOException {
         HttpServer server = new HttpServer(10005);
         File documentRoot = new File("target");
-        server.setDocumentRoot(documentRoot);
+        server.setContentRoot(documentRoot);
         String fileContent = "Hello " + new Date();
         Files.writeString(new File(documentRoot, "index.html").toPath(), fileContent);
         HttpClient client = new HttpClient("localhost", 10005, "/index.html");
@@ -54,7 +54,7 @@ class HttpServerTest {
     @Test
     void shouldReturn404onMissingFile() throws IOException {
         HttpServer server = new HttpServer(10006);
-        server.setDocumentRoot(new File("target"));
+        server.setContentRoot(new File("target"));
         HttpClient client = new HttpClient("localhost", 10006, "/missingFile");
         assertEquals(404, client.getStatusCode());
     }
@@ -63,7 +63,7 @@ class HttpServerTest {
     void shouldReturnCorrectContentType() throws IOException {
         HttpServer server = new HttpServer(10007);
         File documentRoot = new File("target");
-        server.setDocumentRoot(documentRoot);
+        server.setContentRoot(documentRoot);
         Files.writeString(new File(documentRoot, "plain.txt").toPath(), "Plain text");
         HttpClient client = new HttpClient("localhost", 10007, "/plain.txt");
         assertEquals("text/plain", client.getResponseHeader("Content-Type"));
@@ -75,8 +75,10 @@ class HttpServerTest {
         QueryString member = new QueryString("");
         member.addParameter("memberName", "OlaNormann");
         member.addParameter("email", "ola@nordmann.no");
-        new HttpClient("localhost", 10009, "/api/addMember", "POST", member);
+        HttpClient client = new HttpClient("localhost", 10009, "/api/addMember", "POST",
+                "memberName=OlaNormann&email=ola@nordmann.no");
         assertEquals(List.of("OlaNormann"), server.getMemberNames());
     }
+
 
 }

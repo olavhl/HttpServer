@@ -8,10 +8,20 @@ import java.util.Map;
 public class HttpMessage {
 
     private final String startLine;
-    private final Map<String, String> headers = new HashMap<>();
+    private final String body;
+    private final Map<String, String> headers;
 
-    public HttpMessage(String startLine) {
-        this.startLine = startLine;
+    public HttpMessage(Socket socket) throws IOException {
+        startLine = readLine(socket);
+
+        headers = readHeaders(socket);
+
+        String contentLength = headers.get("Content-Length");
+        if (contentLength != null) {
+            body = readBody(socket, Integer.parseInt(contentLength));
+        } else {
+            body = null;
+        }
     }
 
     public static String readLine(Socket socket) throws IOException {
@@ -29,59 +39,37 @@ public class HttpMessage {
         return line.toString();
     }
 
-    public static HttpMessage read(Socket socket) throws IOException {
-        HttpMessage message = new HttpMessage(readLine(socket));
-        message.readHeaders(socket);
-        return message;
-    }
-
-    public void setHeader(String name, String value) {
-        headers.put(name, value);
-    }
-
-    public void write(Socket socket) throws IOException {
-        writeLine(socket, startLine);
-        for (Map.Entry<String, String> header : headers.entrySet()) {
-            writeLine(socket, header.getKey() + ": " + header.getValue());
-        }
-        writeLine(socket, "");
-    }
-
-
-
-    private void writeLine(Socket socket, String startLine) throws IOException {
-        socket.getOutputStream().write((startLine + "\r\n").getBytes());
-    }
-
     public String getStartLine() {
         return startLine;
     }
 
-    public void readHeaders(Socket socket) throws IOException {
+    static Map<String, String> readHeaders(Socket socket) throws IOException {
+        Map<String, String> headers = new HashMap<>();
         String headerLine;
-        while (!(headerLine = HttpMessage.readLine(socket)).isEmpty()) {
+        while (!(headerLine = readLine(socket)).isEmpty()) {
 
             int colonPos = headerLine.indexOf(':');
             String headerName = headerLine.substring(0, colonPos);
             String headerValue = headerLine.substring(colonPos + 1).trim();
 
-            setHeader(headerName, headerValue);
+            headers.put(headerName, headerValue);
         }
+        return headers;
     }
 
-    public String getHeader(String headerName) {
-        return headers.get(headerName);
+    public Map<String, String> getHeaders() {
+        return headers;
     }
 
-    public String readBody(Socket socket) throws IOException {
-        int contentLength;
-        if (getHeader("Content-Length") != null) {
-            contentLength = Integer.parseInt(getHeader("Content-Length"));
-        } else {
-            contentLength = 0;
-        }
+    public String getBody() {
+        return body;
+    }
+
+
+    static String readBody(Socket socket, int contentLength) throws IOException {
         StringBuilder body = new StringBuilder();
-        for (int i = 0; i < contentLength; i++){
+
+        for (int j = 0; j < contentLength; j++){
             body.append((char)socket.getInputStream().read());
         }
         return body.toString();
