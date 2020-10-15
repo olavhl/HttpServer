@@ -15,7 +15,14 @@
             <version>5.6.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.16</version>
+        </dependency>
     </dependencies>
+
+
 
     <build>
         <plugins>
@@ -58,6 +65,7 @@
 
         </plugins>
     </build>
+
 
 
 </project>
