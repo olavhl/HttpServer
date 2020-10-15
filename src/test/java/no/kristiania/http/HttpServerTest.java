@@ -80,5 +80,13 @@ class HttpServerTest {
         assertEquals(List.of("OlaNormann"), server.getMemberNames());
     }
 
+    @Test
+    void shouldDisplayExistingMembers() throws IOException {
+        HttpServer server = new HttpServer(10010);
+        server.getMemberNames().add("Kristian");
+        HttpClient client = new HttpClient("localhost", 10010, "/api/members");
+        assertEquals("<ul><li>Kristian</li></ul>", client.getResponseBody());
+    }
+
 
 }

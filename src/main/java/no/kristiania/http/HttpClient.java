@@ -2,14 +2,13 @@ package no.kristiania.http;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.Map;
 
 public class HttpClient {
 
-    private int statusCode;
-    private Map<String, String> responseHeaders = new HashMap<>();
-    private String responseBody;
+    private final int statusCode;
+    private final Map<String, String> responseHeaders;
+    private final String responseBody;
 
 
     public HttpClient(final String hostname, int port, final String requestTarget) throws IOException {
@@ -39,7 +38,6 @@ public class HttpClient {
         String responseLine = response.getStartLine();
         responseHeaders = response.getHeaders();
         responseBody = response.getBody();
-        //responseBody = getResponseBody();
         String[] responseLineParts = responseLine.split(" ");
 
         statusCode = Integer.parseInt(responseLineParts[1]);
