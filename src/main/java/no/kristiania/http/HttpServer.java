@@ -30,6 +30,10 @@ public class HttpServer {
 
     }
 
+    public static void setMemberNames(List<String> memberNames) {
+        HttpServer.memberNames = memberNames;
+    }
+
     public static void main(String[] args) throws IOException {
 
         HttpServer server = new HttpServer(8080);

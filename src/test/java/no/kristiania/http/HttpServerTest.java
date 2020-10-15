@@ -1,5 +1,6 @@
 package no.kristiania.http;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -83,6 +84,8 @@ class HttpServerTest {
     @Test
     void shouldDisplayExistingMembers() throws IOException {
         HttpServer server = new HttpServer(10010);
+        // Clearing list in HttpServer to test responseBody
+        server.getMemberNames().clear();
         server.getMemberNames().add("Kristian");
         HttpClient client = new HttpClient("localhost", 10010, "/api/members");
         assertEquals("<ul><li>Kristian</li></ul>", client.getResponseBody());

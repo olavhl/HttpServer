@@ -26,7 +26,7 @@ public class HttpClientTest {
 
     @Test
     void shouldReadBody() throws IOException {
-        new HttpServer(10010);
+        new HttpServer(10011);
         HttpClient client = makeEchoRequest("/echo?body=HelloWorld");
         assertEquals("HelloWorld", client.getResponseBody());
     }
