@@ -1,11 +1,10 @@
 package no.kristiania.http;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class QueryString {
-
-    private final Map<String, String> parameters = new HashMap<>();
+    private final Map<String, String> parameters = new LinkedHashMap<>();
 
     public QueryString(String queryString) {
         if (queryString.isEmpty()) return;
@@ -13,18 +12,16 @@ public class QueryString {
             int equalsPos = parameter.indexOf("=");
             String key = parameter.substring(0, equalsPos);
             String value = parameter.substring(equalsPos + 1);
-            parameters.put(key, value);
+            this.parameters.put(key, value);
         }
-
-
     }
 
-    public String getParameter(String name) {
-        return parameters.get(name);
+    public String getParameter(String key) {
+        return parameters.get(key);
     }
 
-    public void addParameter(String name, String value) {
-        parameters.put(name, value);
+    public void addParameter(String key, String value) {
+        parameters.put(key, value);
     }
 
     public String getQueryString() {

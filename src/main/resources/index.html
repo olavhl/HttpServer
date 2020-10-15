@@ -7,23 +7,10 @@
 </head>
 <body>
 <h2>Hello World!</h2>
-<form>
+<form method="post" action="/api/members">
     <p>Member name: <input name="memberName"></p>
     <p>Email address <input name="email"></p>
     <p><button>Add</button></p>
 </form>
-
-<div id="projectMembers"></div>
 </body>
-<script>
-   /* fetch("/projectMembers").then(function(response) {
-        return response.text();
-    }).then(function (text){
-       document.getElementById("projectMembers") =;
-    });*/
-
-   fetch("/projectMembers").then(response => response.text()).then(html => {
-       document.getElementById("projectMembers").innerHTML = html;
-   })
-</script>
 </html>
