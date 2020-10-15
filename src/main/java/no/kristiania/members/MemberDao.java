@@ -1,20 +1,16 @@
 package no.kristiania.members;
-
+/*
 import org.postgresql.ds.PGSimpleDataSource;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class MemberDao {
 
-    private ArrayList<String> members = new ArrayList<>();
-    private DataSource dataSource;
-    private String memberFirstName;
+    private final DataSource dataSource;
 
     public MemberDao(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -27,40 +23,52 @@ public class MemberDao {
         dataSource.setUser("projectmember");
         dataSource.setPassword("pojewojrwjrep");
 
+        MemberDao memberDao = new MemberDao(dataSource);
+
+        System.out.println("Please enter first name:");
+        Scanner scanner = new Scanner(System.in);
+        String firstName = scanner.nextLine();
 
 
-        try ( Connection connection = dataSource.getConnection() ) {
+        memberDao.insertFirstName(firstName);
+        for (String memberName : memberDao.list()) {
+            System.out.println(memberName);
+
+        }
+    }
+
+    public void insertFirstName(String firstName) throws SQLException {
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement("INSERT INTO members (first_name) VALUES (?)")) {
+                statement.setString(1, firstName);
+                statement.executeUpdate();
+            }
+        }
+    }
+/*
+    public void insertLastName(String lastName) throws SQLException {
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement("INSERT INTO members (first_name) VALUES (?)")) {
+                statement.setString(1, lastName);
+                statement.executeUpdate();
+            }
+        }
+    }
+
+    public List<String> list() throws SQLException {
+        List<String> members = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("select * from members")) {
                 try (ResultSet rs = statement.executeQuery()) {
                     while(rs.next()) {
-                        String firstName = rs.getString("first_name");
-                        String lastName = rs.getString("last_name");
-                        String email = rs.getString("email");
-                        
-                        System.out.println(firstName + " " + lastName);
-                        System.out.println(email + "\n");
+                       members.add(rs.getString("first_name"));
+                       members.add(rs.getString("last_name"));
+                       //members.add(rs.getString("email"));
                     }
                 }
             }
         }
-
-
-
-
-    }
-
-    public void insertFirstName(String member) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement("INSERT INTO members (first_name) VALUES (?)")) {
-                statement.setString(1, memberFirstName);
-                statement.executeUpdate();
-            }
-        }
-        
-        members.add(member);
-    }
-
-    public List<String> list() {
         return members;
     }
-}
+
+}*/
