@@ -24,7 +24,7 @@ public class MemberDao {
             String email = rs.getString("email");
 
             System.out.println(firstName + " " + lastName);
-            System.out.println(email+"\n");
+            System.out.println(email + "\n");
         }
 
     }
