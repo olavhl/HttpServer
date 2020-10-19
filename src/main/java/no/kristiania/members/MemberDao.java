@@ -28,29 +28,34 @@ public class MemberDao {
         System.out.println("Please enter first name:");
         Scanner scanner = new Scanner(System.in);
         String firstName = scanner.nextLine();
-        memberDao.insertFirstName(firstName);
 
-        for (String memberName : memberDao.list()) {
-            System.out.println(memberName);
+        Members members = new Members();
+        members.setFirstName(firstName);
+        memberDao.insertFirstName(members);
+
+        for (Members member : memberDao.list()) {
+            System.out.println(member);
         }
     }
 
-    public void insertFirstName(String firstName) throws SQLException {
+    public void insertFirstName(Members members) throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("INSERT INTO members (first_name) VALUES (?)")) {
-                statement.setString(1, firstName);
+                statement.setString(1, members.getFirstName());
                 statement.executeUpdate();
             }
         }
     }
 
-    public List<String> list() throws SQLException {
-        List<String> members = new ArrayList<>();
+    public List<Members> list() throws SQLException {
+        List<Members> members = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("select * from members")) {
                 try (ResultSet rs = statement.executeQuery()) {
                     while(rs.next()) {
-                       members.add(rs.getString("first_name"));
+                        Members member = new Members();
+                        member.setFirstName(rs.getString("first_name"));
+                        members.add(member);
                     }
                 }
             }
