@@ -1,5 +1,7 @@
 package no.kristiania.http;
 
+import no.kristiania.database.Member;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,7 +13,7 @@ import java.util.List;
 public class HttpServer {
 
     private File contentRoot;
-    private static List<String> memberNames = new ArrayList<>();
+    private static List<Member> members = new ArrayList<>();
 
     public HttpServer(int port) throws IOException {
 
@@ -28,10 +30,6 @@ public class HttpServer {
              }
         }).start();
 
-    }
-
-    public static void setMemberNames(List<String> memberNames) {
-        HttpServer.memberNames = memberNames;
     }
 
     public static void main(String[] args) throws IOException {
@@ -56,11 +54,17 @@ public class HttpServer {
        if (requestMethod.equals("POST")){
            QueryString requestParameter = new QueryString(request.getBody());
 
-           memberNames.add(requestParameter.getParameter("memberName"));
+           Member member = new Member();
+           member.setFirstName(requestParameter.getParameter("first_name"));
+           member.setLastName(requestParameter.getParameter("last_name"));
+           member.setEmail(requestParameter.getParameter("email"));
+
+           members.add(member);
 
            String body = "Okay";
            String response = "HTTP/1.1 200 OK\r\n" +
                    "Content-Length: " + body.length() + "\r\n" +
+                   "Connection: close\r\n" +
                    "\r\n" +
                    body;
 
@@ -77,6 +81,7 @@ public class HttpServer {
                    String body = file + " does not exist";
                    String response = "HTTP/1.1 404 Not Found\r\n" +
                            "Content-Length: " + body.length() + "\r\n" +
+                           "Connection: close\r\n" +
                            "\r\n" +
                            body;
                    clientSocket.getOutputStream().write(response.getBytes());
@@ -118,6 +123,7 @@ public class HttpServer {
         String response = "HTTP/1.1 " + statusCode + " OK\r\n" +
                 "Content-Length: " + body.length() + "\r\n" +
                 "Content-Type: text/plain\r\n" +
+                "Connection: close\r\n" +
                 "\r\n" +
                 body;
 
@@ -126,8 +132,8 @@ public class HttpServer {
 
     private void handleGetMembers(Socket clientSocket) throws IOException {
         String body = "<ul>";
-        for (String memberName : memberNames) {
-            body += "<li>" + memberName + "</li>";
+        for (Member member : members) {
+            body += "<li>" + member.getFirstName() + " " + member.getLastName() +  " (" + member.getEmail() + ")" + "</li>";
         }
         body += "</ul>";
 
@@ -147,7 +153,4 @@ public class HttpServer {
         contentRoot = documentRoot;
     }
 
-    public List<String> getMemberNames() {
-        return memberNames;
-    }
 }
