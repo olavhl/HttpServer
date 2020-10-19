@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -53,7 +52,7 @@ public class HttpServer {
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
 
         dataSource.setUrl(properties.getProperty("dataSource.url"));
-        dataSource.setUser(properties.getProperty("dataSource.user"));
+        dataSource.setUser(properties.getProperty("dataSource.username"));
         dataSource.setPassword(properties.getProperty("dataSource.password"));
 
         logger.info("Using database {}", dataSource.getUrl());
@@ -62,7 +61,7 @@ public class HttpServer {
 
         HttpServer server = new HttpServer(8080, dataSource);
         logger.info("Started on http://localhost:{}/index.html", 8080);
-        //server.setContentRoot(new File("src/main/resources/"));
+        server.setContentRoot(new File("target/classes/"));
 
     }
 
