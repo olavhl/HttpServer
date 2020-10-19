@@ -1,5 +1,5 @@
 package no.kristiania.members;
-/*
+
 import org.postgresql.ds.PGSimpleDataSource;
 
 import javax.sql.DataSource;
@@ -28,12 +28,10 @@ public class MemberDao {
         System.out.println("Please enter first name:");
         Scanner scanner = new Scanner(System.in);
         String firstName = scanner.nextLine();
-
-
         memberDao.insertFirstName(firstName);
+
         for (String memberName : memberDao.list()) {
             System.out.println(memberName);
-
         }
     }
 
@@ -41,15 +39,6 @@ public class MemberDao {
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("INSERT INTO members (first_name) VALUES (?)")) {
                 statement.setString(1, firstName);
-                statement.executeUpdate();
-            }
-        }
-    }
-/*
-    public void insertLastName(String lastName) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement("INSERT INTO members (first_name) VALUES (?)")) {
-                statement.setString(1, lastName);
                 statement.executeUpdate();
             }
         }
@@ -62,8 +51,6 @@ public class MemberDao {
                 try (ResultSet rs = statement.executeQuery()) {
                     while(rs.next()) {
                        members.add(rs.getString("first_name"));
-                       members.add(rs.getString("last_name"));
-                       //members.add(rs.getString("email"));
                     }
                 }
             }
@@ -71,4 +58,4 @@ public class MemberDao {
         return members;
     }
 
-}*/
+}
