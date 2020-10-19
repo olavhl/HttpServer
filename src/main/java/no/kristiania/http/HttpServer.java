@@ -180,4 +180,7 @@ public class HttpServer {
         contentRoot = documentRoot;
     }
 
+    public List<Member> getMemberNames() throws SQLException {
+        return memberDao.list();
+    }
 }

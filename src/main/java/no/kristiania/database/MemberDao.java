@@ -70,12 +70,7 @@ public class MemberDao {
                 statement.setLong(1, id);
                 try (ResultSet rs = statement.executeQuery()) {
                     if (rs.next()) {
-                        Member member = new Member();
-                        member.setId(rs.getLong("id"));
-                        member.setFirstName(rs.getString("first_name"));
-                        member.setLastName(rs.getString("last_name"));
-                        member.setEmail(rs.getString("email"));
-                        return member;
+                        return setPropertiesToMember(rs);
                     } else {
                         return null;
                     }
@@ -84,19 +79,26 @@ public class MemberDao {
         }
     }
 
+    private Member setPropertiesToMember(ResultSet rs) throws SQLException {
+        Member member = new Member();
+        member.setId(rs.getLong("id"));
+        member.setFirstName(rs.getString("first_name"));
+        member.setLastName(rs.getString("last_name"));
+        member.setEmail(rs.getString("email"));
+        return member;
+    }
+
     public List<Member> list() throws SQLException {
         List<Member> members = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("select * from members")) {
                 try (ResultSet rs = statement.executeQuery()) {
                     while(rs.next()) {
-                        Member member = new Member();
-                        member.setFirstName(rs.getString("first_name"));
-                        members.add(member);
+                        members.add(setPropertiesToMember(rs));
                     }
+                    return members;
                 }
             }
         }
-        return members;
     }
 }
