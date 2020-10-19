@@ -1,49 +1,59 @@
 package no.kristiania.http;
 
+import org.flywaydb.core.Flyway;
+import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Date;
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class HttpServerTest {
 
+    private JdbcDataSource dataSource;
+
+    @BeforeEach
+    void setUp() {
+        dataSource = new JdbcDataSource();
+        dataSource.setUrl("jdbc:h2:mem:testdatabase;DB_CLOSE_DELAY=-1");
+
+        Flyway.configure().dataSource(dataSource).load().migrate();
+    }
+
     @Test
     void shouldReturnSuccessfulErrorCode() throws IOException {
-        new HttpServer(10001);
+        new HttpServer(10001, dataSource);
         HttpClient client = new HttpClient("localhost", 10001, "/echo");
         assertEquals(200, client.getStatusCode());
     }
 
     @Test
     void shouldReturnUnsuccessfulErrorCode() throws IOException {
-        new HttpServer(10002);
+        new HttpServer(10002, dataSource);
         HttpClient client = new HttpClient("localhost", 10002, "/echo?status=404");
         assertEquals(404, client.getStatusCode());
     }
 
     @Test
     void shouldReturnHttpHeaders() throws IOException {
-        new HttpServer(10003);
+        new HttpServer(10003, dataSource);
         HttpClient client = new HttpClient("localhost", 10003, "/echo?body=HelloWorld");
         assertEquals("10", client.getResponseHeader("Content-Length"));
     }
 
     @Test
     void shouldReturnResponseBody() throws IOException {
-        new HttpServer(10004);
+        new HttpServer(10004, dataSource);
         HttpClient client = new HttpClient("localhost", 10004, "/echo?body=HelloWorld");
         assertEquals("HelloWorld", client.getResponseBody());
     }
 
     @Test
     void shouldReturnFileContent() throws IOException {
-        HttpServer server = new HttpServer(10005);
+        HttpServer server = new HttpServer(10005, dataSource);
         File documentRoot = new File("target");
         server.setContentRoot(documentRoot);
         String fileContent = "Hello " + new Date();
@@ -54,7 +64,7 @@ class HttpServerTest {
 
     @Test
     void shouldReturn404onMissingFile() throws IOException {
-        HttpServer server = new HttpServer(10006);
+        HttpServer server = new HttpServer(10006, dataSource);
         server.setContentRoot(new File("target"));
         HttpClient client = new HttpClient("localhost", 10006, "/missingFile");
         assertEquals(404, client.getStatusCode());
@@ -62,7 +72,7 @@ class HttpServerTest {
 
     @Test
     void shouldReturnCorrectContentType() throws IOException {
-        HttpServer server = new HttpServer(10007);
+        HttpServer server = new HttpServer(10007, dataSource);
         File documentRoot = new File("target");
         server.setContentRoot(documentRoot);
         Files.writeString(new File(documentRoot, "plain.txt").toPath(), "Plain text");

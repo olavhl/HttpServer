@@ -1,30 +1,42 @@
 package no.kristiania.http;
 
 import no.kristiania.database.Member;
+import no.kristiania.database.MemberDao;
+import org.flywaydb.core.Flyway;
+import org.postgresql.ds.PGSimpleDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class HttpServer {
 
-    private File contentRoot;
-    private static List<Member> members = new ArrayList<>();
+    private static final Logger logger = LoggerFactory.getLogger(HttpServer.class);
 
-    public HttpServer(int port) throws IOException {
+    private File contentRoot;
+    //private static final List<Member> members = new ArrayList<>();
+    private MemberDao memberDao;
+
+    public HttpServer(int port, DataSource dataSource) throws IOException {
+        memberDao = new MemberDao(dataSource);
 
         ServerSocket serverSocket = new ServerSocket(port);
 
         new Thread(() -> {
              while (true) {
-                try {
-                      Socket clientSocket = serverSocket.accept();
+                try (Socket clientSocket = serverSocket.accept();) {
                       handleRequest(clientSocket);
-                } catch (IOException e) {
+                } catch (IOException | SQLException e) {
                         e.printStackTrace();
                 }
              }
@@ -33,13 +45,28 @@ public class HttpServer {
     }
 
     public static void main(String[] args) throws IOException {
+        Properties properties = new Properties();
+        try (FileReader fileReader = new FileReader("pgr203.properties")) {
+            properties.load(fileReader);
+        }
 
-        HttpServer server = new HttpServer(8080);
-        server.setContentRoot(new File("src/main/resources/"));
+        PGSimpleDataSource dataSource = new PGSimpleDataSource();
+
+        dataSource.setUrl(properties.getProperty("dataSource.url"));
+        dataSource.setUser(properties.getProperty("dataSource.user"));
+        dataSource.setPassword(properties.getProperty("dataSource.password"));
+
+        logger.info("Using database {}", dataSource.getUrl());
+        Flyway.configure().dataSource(dataSource).load().migrate();
+
+
+        HttpServer server = new HttpServer(8080, dataSource);
+        logger.info("Started on http://localhost:{}/index.html", 8080);
+        //server.setContentRoot(new File("src/main/resources/"));
 
     }
 
-    private void handleRequest(Socket clientSocket) throws IOException {
+    private void handleRequest(Socket clientSocket) throws IOException, SQLException {
 
         HttpMessage request = new HttpMessage(clientSocket);
         String requestLine = request.getStartLine();
@@ -59,7 +86,7 @@ public class HttpServer {
            member.setLastName(requestParameter.getParameter("last_name"));
            member.setEmail(requestParameter.getParameter("email"));
 
-           members.add(member);
+           memberDao.insert(member);
 
            String body = "Okay";
            String response = "HTTP/1.1 200 OK\r\n" +
@@ -130,9 +157,9 @@ public class HttpServer {
         clientSocket.getOutputStream().write(response.getBytes());
     }
 
-    private void handleGetMembers(Socket clientSocket) throws IOException {
+    private void handleGetMembers(Socket clientSocket) throws IOException, SQLException {
         String body = "<ul>";
-        for (Member member : members) {
+        for (Member member : memberDao.list()) {
             body += "<li>" + member.getFirstName() + " " + member.getLastName() +  " (" + member.getEmail() + ")" + "</li>";
         }
         body += "</ul>";
