@@ -20,7 +20,6 @@ public class HttpClient {
         Socket socket = new Socket(hostname, port);
 
         String contentLengthHeader = requestBody != null ? "Content-Length: " + requestBody.length() + "\r\n" : "";
-        //String requestBody = form.getQueryString();
 
         String request = method + " " + requestTarget + " HTTP/1.1\r\n" +
                 "Host: " + hostname + "\r\n" +
