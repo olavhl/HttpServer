@@ -6,12 +6,8 @@ import org.flywaydb.core.Flyway;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.sql.DataSource;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
@@ -61,7 +57,6 @@ public class HttpServer {
 
         HttpServer server = new HttpServer(8080, dataSource);
         logger.info("Started on http://localhost:{}/index.html", 8080);
-        server.setContentRoot(new File("target/classes/"));
 
     }
 
@@ -101,36 +96,48 @@ public class HttpServer {
            } else if (requestPath.equals("/api/members")) {
                handleGetMembers(clientSocket);
            } else {
-               File file = new File(contentRoot, requestPath);
-
-               if (!file.exists()) {
-                   String body = file + " does not exist";
-                   String response = "HTTP/1.1 404 Not Found\r\n" +
-                           "Content-Length: " + body.length() + "\r\n" +
-                           "Connection: close\r\n" +
-                           "\r\n" +
-                           body;
-                   clientSocket.getOutputStream().write(response.getBytes());
-                   return;
-               }
-               String statusCode = "200";
-               String contentType = "text/plain";
-               if (file.getName().endsWith(".html")) {
-                   contentType = "text/html";
-               } else if (file.getName().endsWith(".css")) {
-                   contentType = "text/css";
-               }
-
-               String response = "HTTP/1.1 " + statusCode + " OK\r\n" +
-                       "Content-Length: " + file.length() + "\r\n" +
-                       "Connection: close\r\n" +
-                       "Content-Type: " + contentType + "\r\n" +
-                       "\r\n";
-               clientSocket.getOutputStream().write(response.getBytes());
-
-               new FileInputStream(file).transferTo(clientSocket.getOutputStream());
+               handleFileRequest(clientSocket, requestPath);
+               logger.info("See members at http://localhost:{}/showMembers.html", 8080);
            }
        }
+    }
+
+    private void handleFileRequest(Socket clientSocket, String requestPath) throws IOException {
+        try (InputStream inputStream =  getClass().getResourceAsStream(requestPath)) {
+            if (inputStream == null) {
+                String body = requestPath + " does not exist";
+                String response = "HTTP/1.1 404 Not Found\r\n" +
+                        "Content-Length: " + body.length() + "\r\n" +
+                        "Connection: close\r\n" +
+                        "\r\n" +
+                        body;
+
+                clientSocket.getOutputStream().write(response.getBytes());
+                return;
+            }
+
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            inputStream.transferTo(buffer);
+
+            String contentType = "text/plain";
+            if (requestPath.endsWith(".html")) {
+                contentType = "text/html";
+            } else if (requestPath.endsWith(".css")) {
+                contentType = "text/css";
+            }
+
+            String response = "HTTP/1.1 200 OK\r\n" +
+                    "Content-Length: " + buffer.toByteArray().length + "\r\n" +
+                    "Connection: close\r\n" +
+                    "Content-Type: " + contentType +
+                    "\r\n" +
+                    "\r\n";
+
+        clientSocket.getOutputStream().write(response.getBytes());
+        clientSocket.getOutputStream().write(buffer.toByteArray());
+        }
+
+
     }
 
     private void handleEchoRequest(Socket clientSocket, String requestTarget, int questionPos) throws IOException {
@@ -171,12 +178,6 @@ public class HttpServer {
                 body;
 
         clientSocket.getOutputStream().write(response.getBytes());
-    }
-
-
-
-    public void setContentRoot(File documentRoot) {
-        contentRoot = documentRoot;
     }
 
     public List<Member> getMemberNames() throws SQLException {

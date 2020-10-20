@@ -58,18 +58,18 @@ class HttpServerTest {
     @Test
     void shouldReturnFileContent() throws IOException {
         HttpServer server = new HttpServer(10005, dataSource);
-        File documentRoot = new File("target");
-        server.setContentRoot(documentRoot);
+        File documentRoot = new File("target/test-classes");
+
         String fileContent = "Hello " + new Date();
-        Files.writeString(new File(documentRoot, "index.html").toPath(), fileContent);
-        HttpClient client = new HttpClient("localhost", 10005, "/index.html");
+        Files.writeString(new File(documentRoot, "test.txt").toPath(), fileContent);
+
+        HttpClient client = new HttpClient("localhost", 10005, "/test.txt");
         assertEquals(fileContent, client.getResponseBody());
     }
 
     @Test
     void shouldReturn404onMissingFile() throws IOException {
         HttpServer server = new HttpServer(10006, dataSource);
-        server.setContentRoot(new File("target"));
         HttpClient client = new HttpClient("localhost", 10006, "/missingFile");
         assertEquals(404, client.getStatusCode());
     }
@@ -78,7 +78,6 @@ class HttpServerTest {
     void shouldReturnCorrectContentType() throws IOException {
         HttpServer server = new HttpServer(10007, dataSource);
         File documentRoot = new File("target");
-        server.setContentRoot(documentRoot);
         Files.writeString(new File(documentRoot, "plain.txt").toPath(), "Plain text");
         HttpClient client = new HttpClient("localhost", 10007, "/plain.txt");
         assertEquals("text/plain", client.getResponseHeader("Content-Type"));
