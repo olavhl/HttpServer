@@ -27,6 +27,7 @@ class HttpServerTest {
         Flyway.configure().dataSource(dataSource).load().migrate();
     }
 
+    // Trying to fix
     @Test
     void shouldReturnSuccessfulErrorCode() throws IOException {
         new HttpServer(10001, dataSource);
