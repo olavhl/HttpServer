@@ -30,7 +30,9 @@ public class HttpServer {
         ProjectDao projectDao = new ProjectDao(dataSource);
         controllers = Map.of(
                 "/api/newProject", new ProjectPostController(projectDao),
-                "/api/project", new ProjectGetController(projectDao)
+                "/api/project", new ProjectGetController(projectDao),
+                "/api/projectOption", new ProjectOptionController(projectDao),
+            "/api/memberOption", new MemberOptionController(memberDao)
         );
 
         serverSocket = new ServerSocket(port);

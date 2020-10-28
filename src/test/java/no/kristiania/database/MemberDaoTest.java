@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MemberDaoTest {
 
     private MemberDao memberDao;
-    private Random random = new Random();
+    private static Random random = new Random();
 
     @BeforeEach
     void setUp() {
@@ -47,7 +47,7 @@ public class MemberDaoTest {
     }
 
 
-    private Member exampleMember() {
+    public static Member exampleMember() {
         Member member = new Member();
         member.setFirstName(exampleFirstName());
         member.setLastName(exampleLastName());
@@ -55,18 +55,18 @@ public class MemberDaoTest {
         return member;
     }
 
-    private String exampleFirstName() {
+    private static String exampleFirstName() {
         String[] options = {"Alex", "Ivar", "Peder", "Kent", "Arne"};
         return  options[random.nextInt(options.length)];
     }
 
-    private String exampleLastName() {
+    private static String exampleLastName() {
         String[] options = {"Andreassen", "Karlsen", "Hansen", "Lodden", "Lyngholm"};
         Random random = new Random();
         return  options[random.nextInt(options.length)];
     }
 
-    private String exampleEmail() {
+    private static String exampleEmail() {
         String[] options = {"alex@gmail.com", "ivar@hotmail.com", "peder@yahoo.no", "kent@outlook.com", "arne@egms.student.no"};
         Random random = new Random();
         return  options[random.nextInt(options.length)];
