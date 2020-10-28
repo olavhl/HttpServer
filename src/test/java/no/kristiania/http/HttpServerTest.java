@@ -87,7 +87,7 @@ class HttpServerTest {
     @Test
     void shouldPostMember() throws IOException, SQLException {
         HttpServer server = new HttpServer(10009, dataSource);
-        HttpClient client = new HttpClient("localhost", 10009, "/api/addMember", "POST",
+        HttpClient client = new HttpClient("localhost", 10009, "/api/members", "POST",
                 "first_name=OlaNormann&email=ola@nordmann.no");
         assertThat(server.getMemberNames()).extracting(Member::getFirstName).contains("OlaNormann");
     }
@@ -109,7 +109,7 @@ class HttpServerTest {
     @Test
     void shouldPostNewProject() throws IOException {
         HttpServer server = new HttpServer(10011, dataSource);
-        String requestBody = "projectName=angular";
+        String requestBody = "projectName=angular&status=Good";
         HttpClient postClient = new HttpClient("localhost", 10011, "/api/newProject", "POST", requestBody);
         assertEquals(200, postClient.getStatusCode());
 

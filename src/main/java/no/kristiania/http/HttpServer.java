@@ -2,6 +2,7 @@ package no.kristiania.http;
 
 import no.kristiania.database.Member;
 import no.kristiania.database.MemberDao;
+import no.kristiania.database.ProjectDao;
 import org.flywaydb.core.Flyway;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.slf4j.Logger;
@@ -19,16 +20,16 @@ public class HttpServer {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpServer.class);
 
-    private Map<String, HttpController> controllers = Map.of(
-            "/api/newProject", new ProjectPostController(),
-            "/api/project", new ProjectGetController()
-    );
-
-    //private static final List<Member> members = new ArrayList<>();
+    private Map<String, HttpController> controllers;
     private MemberDao memberDao;
 
     public HttpServer(int port, DataSource dataSource) throws IOException {
         memberDao = new MemberDao(dataSource);
+        ProjectDao projectDao = new ProjectDao(dataSource);
+        controllers = Map.of(
+                "/api/newProject", new ProjectPostController(projectDao),
+                "/api/project", new ProjectGetController(projectDao)
+        );
 
         ServerSocket serverSocket = new ServerSocket(port);
 
@@ -78,7 +79,7 @@ public class HttpServer {
        String requestPath = questionPos != -1 ? requestTarget.substring(0, questionPos) : requestTarget;
 
        if (requestMethod.equals("POST")){
-           if (requestPath.equals("/api/newProject")) {
+           if (requestPath.equals("/api/members")) {
                handlePostProject(clientSocket, request);
            } else {
                getController(requestPath).handle(request, clientSocket);
