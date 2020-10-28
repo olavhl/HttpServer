@@ -106,5 +106,16 @@ class HttpServerTest {
         assertThat(client.getResponseBody()).contains("<li>Kristian Pedersen (ok@gmail.com)</li>");
     }
 
+    @Test
+    void shouldPostNewProject() throws IOException {
+        HttpServer server = new HttpServer(10011, dataSource);
+        String requestBody = "projectName=angular";
+        HttpClient postClient = new HttpClient("localhost", 10011, "/api/newProject", "POST", requestBody);
+        assertEquals(200, postClient.getStatusCode());
+
+        HttpClient getClient = new HttpClient("localhost", 10011, "/api/project");
+        assertThat(getClient.getResponseBody()).contains("<li>angular</li>");
+    }
+
 
 }
