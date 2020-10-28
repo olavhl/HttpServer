@@ -18,83 +18,76 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class HttpServerTest {
 
     private JdbcDataSource dataSource;
+    private HttpServer server;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         dataSource = new JdbcDataSource();
         dataSource.setUrl("jdbc:h2:mem:testdatabase;DB_CLOSE_DELAY=-1");
 
         Flyway.configure().dataSource(dataSource).load().migrate();
+        server = new HttpServer(0, dataSource);
     }
 
     // Trying to fix
     @Test
     void shouldReturnSuccessfulErrorCode() throws IOException {
-        new HttpServer(10001, dataSource);
-        HttpClient client = new HttpClient("localhost", 10001, "/echo");
+        HttpClient client = new HttpClient("localhost", server.getPort(), "/echo");
         assertEquals(200, client.getStatusCode());
     }
 
     @Test
     void shouldReturnUnsuccessfulErrorCode() throws IOException {
-        new HttpServer(10002, dataSource);
-        HttpClient client = new HttpClient("localhost", 10002, "/echo?status=404");
+        HttpClient client = new HttpClient("localhost", server.getPort(), "/echo?status=404");
         assertEquals(404, client.getStatusCode());
     }
 
     @Test
     void shouldReturnHttpHeaders() throws IOException {
-        new HttpServer(10003, dataSource);
-        HttpClient client = new HttpClient("localhost", 10003, "/echo?body=HelloWorld");
+        HttpClient client = new HttpClient("localhost", server.getPort(), "/echo?body=HelloWorld");
         assertEquals("10", client.getResponseHeader("Content-Length"));
     }
 
     @Test
     void shouldReturnResponseBody() throws IOException {
-        new HttpServer(10004, dataSource);
-        HttpClient client = new HttpClient("localhost", 10004, "/echo?body=HelloWorld");
+        HttpClient client = new HttpClient("localhost", server.getPort(), "/echo?body=HelloWorld");
         assertEquals("HelloWorld", client.getResponseBody());
     }
 
     @Test
     void shouldReturnFileContent() throws IOException {
-        HttpServer server = new HttpServer(10005, dataSource);
         File documentRoot = new File("target/test-classes");
 
         String fileContent = "Hello " + new Date();
         Files.writeString(new File(documentRoot, "test.txt").toPath(), fileContent);
 
-        HttpClient client = new HttpClient("localhost", 10005, "/test.txt");
+        HttpClient client = new HttpClient("localhost", server.getPort(), "/test.txt");
         assertEquals(fileContent, client.getResponseBody());
     }
 
     @Test
     void shouldReturn404onMissingFile() throws IOException {
-        HttpServer server = new HttpServer(10006, dataSource);
-        HttpClient client = new HttpClient("localhost", 10006, "/missingFile");
+        HttpClient client = new HttpClient("localhost", server.getPort(), "/missingFile");
         assertEquals(404, client.getStatusCode());
     }
 
     @Test
     void shouldReturnCorrectContentType() throws IOException {
-        HttpServer server = new HttpServer(10007, dataSource);
         File documentRoot = new File("target");
         Files.writeString(new File(documentRoot, "plain.txt").toPath(), "Plain text");
-        HttpClient client = new HttpClient("localhost", 10007, "/plain.txt");
+        HttpClient client = new HttpClient("localhost", server.getPort(), "/plain.txt");
         assertEquals("text/plain", client.getResponseHeader("Content-Type"));
     }
 
     @Test
     void shouldPostMember() throws IOException, SQLException {
-        HttpServer server = new HttpServer(10009, dataSource);
-        HttpClient client = new HttpClient("localhost", 10009, "/api/members", "POST",
+        HttpClient client = new HttpClient("localhost", server.getPort(), "/api/members", "POST",
                 "first_name=OlaNormann&email=ola@nordmann.no");
         assertThat(server.getMemberNames()).extracting(Member::getFirstName).contains("OlaNormann");
     }
 
    @Test
     void shouldDisplayExistingMembers() throws IOException, SQLException {
-        HttpServer server = new HttpServer(10010, dataSource);
         // Clearing list in HttpServer to test responseBody
         Member member = new Member();
         member.setFirstName("Kristian");
@@ -102,18 +95,17 @@ class HttpServerTest {
         member.setEmail("ok@gmail.com");
         MemberDao memberDao = new MemberDao(dataSource);
         memberDao.insert(member);
-        HttpClient client = new HttpClient("localhost", 10010, "/api/members");
+        HttpClient client = new HttpClient("localhost", server.getPort(), "/api/members");
         assertThat(client.getResponseBody()).contains("<li>Kristian Pedersen (ok@gmail.com)</li>");
     }
 
     @Test
     void shouldPostNewProject() throws IOException {
-        HttpServer server = new HttpServer(10011, dataSource);
         String requestBody = "projectName=angular&status=Good";
-        HttpClient postClient = new HttpClient("localhost", 10011, "/api/newProject", "POST", requestBody);
+        HttpClient postClient = new HttpClient("localhost", server.getPort(), "/api/newProject", "POST", requestBody);
         assertEquals(200, postClient.getStatusCode());
 
-        HttpClient getClient = new HttpClient("localhost", 10011, "/api/project");
+        HttpClient getClient = new HttpClient("localhost", server.getPort(), "/api/project");
         assertThat(getClient.getResponseBody()).contains("<li>angular</li>");
     }
 

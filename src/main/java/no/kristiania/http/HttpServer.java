@@ -22,6 +22,8 @@ public class HttpServer {
 
     private Map<String, HttpController> controllers;
     private MemberDao memberDao;
+    private ServerSocket serverSocket;
+
 
     public HttpServer(int port, DataSource dataSource) throws IOException {
         memberDao = new MemberDao(dataSource);
@@ -31,7 +33,7 @@ public class HttpServer {
                 "/api/project", new ProjectGetController(projectDao)
         );
 
-        ServerSocket serverSocket = new ServerSocket(port);
+        serverSocket = new ServerSocket(port);
 
         new Thread(() -> {
              while (true) {
@@ -206,5 +208,9 @@ public class HttpServer {
 
     public List<Member> getMemberNames() throws SQLException {
         return memberDao.list();
+    }
+
+    public int getPort() {
+        return serverSocket.getLocalPort();
     }
 }
