@@ -19,7 +19,7 @@ public class ProjectDao {
 
         try (Connection connection = dataSource.getConnection()){
 
-            try(PreparedStatement statement = connection.prepareStatement("SELECT * FROM members")){
+            try(PreparedStatement statement = connection.prepareStatement("SELECT * FROM projects")){
                 try (ResultSet rs = statement.executeQuery()){
                     List<Project> members = new ArrayList<>();
                     while (rs.next()){
@@ -33,8 +33,10 @@ public class ProjectDao {
 
     }
 
-    private Project mapRowToProject(ResultSet rs) {
-        return new Project();
+    private Project mapRowToProject(ResultSet rs) throws SQLException {
+        Project project = new Project();
+        project.setName(rs.getString("name"));
+        return project;
     }
 
 
@@ -42,7 +44,7 @@ public class ProjectDao {
 
         try (Connection connection = dataSource.getConnection()){
             try (PreparedStatement statement = connection.prepareStatement(
-                    "INSERT INTO members (first_name, last_name, email) values (?,?,?)",
+                    "INSERT INTO projects (name) values (?)",
                     Statement.RETURN_GENERATED_KEYS
             )){
 
