@@ -1,14 +1,14 @@
 package no.kristiania.database;
 
 public class Member {
-    public Long id;
+    public int id;
     private  String firstName, lastName, email;
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

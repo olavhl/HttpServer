@@ -81,7 +81,7 @@ public class HttpServer {
        String requestPath = questionPos != -1 ? requestTarget.substring(0, questionPos) : requestTarget;
 
        if (requestMethod.equals("POST")){
-           if (requestPath.equals("/api/members")) {
+           if (requestPath.equals("/api/member")) {
                handlePostProject(clientSocket, request);
            } else {
                getController(requestPath).handle(request, clientSocket);
@@ -89,7 +89,7 @@ public class HttpServer {
        } else {
            if (requestPath.equals("/echo")) {
                handleEchoRequest(clientSocket, requestTarget, questionPos);
-           } else if (requestPath.equals("/api/members")) {
+           } else if (requestPath.equals("/api/member")) {
                handleGetMembers(clientSocket);
            } else {
                HttpController controller = controllers.get(requestPath);

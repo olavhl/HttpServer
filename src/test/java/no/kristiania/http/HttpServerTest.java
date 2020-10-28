@@ -81,7 +81,7 @@ class HttpServerTest {
 
     @Test
     void shouldPostMember() throws IOException, SQLException {
-        HttpClient client = new HttpClient("localhost", server.getPort(), "/api/members", "POST",
+        HttpClient client = new HttpClient("localhost", server.getPort(), "/api/member", "POST",
                 "first_name=OlaNormann&email=ola@nordmann.no");
         assertThat(server.getMemberNames()).extracting(Member::getFirstName).contains("OlaNormann");
     }
@@ -95,7 +95,7 @@ class HttpServerTest {
         member.setEmail("ok@gmail.com");
         MemberDao memberDao = new MemberDao(dataSource);
         memberDao.insert(member);
-        HttpClient client = new HttpClient("localhost", server.getPort(), "/api/members");
+        HttpClient client = new HttpClient("localhost", server.getPort(), "/api/member");
         assertThat(client.getResponseBody()).contains("<li>Kristian Pedersen (ok@gmail.com)</li>");
     }
 
