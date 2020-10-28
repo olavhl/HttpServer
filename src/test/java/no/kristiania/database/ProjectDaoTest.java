@@ -7,12 +7,14 @@ import org.junit.jupiter.api.Test;
 
 
 import java.sql.SQLException;
+import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProjectDaoTest {
 
     private ProjectDao projectDao;
+    private Random random = new Random();
 
     @BeforeEach
     void setUp() {
@@ -44,14 +46,21 @@ public class ProjectDaoTest {
         projectDao.insert(exampleProject());
         Project project = exampleProject();
         projectDao.insert(project);
+        assertThat(project).hasNoNullFieldsOrProperties();
         assertThat(projectDao.retrieve(project.getId()))
                 .usingRecursiveComparison()
                 .isEqualTo(project);
     }
 
     private Project exampleProject() {
+        Project project = new Project();
+        project.setName(exampleProjectName());
+        return project;
+    }
 
-        return new Project();
+    private String exampleProjectName() {
+        String[] options = {"Java", "Javascript", "HTML/CSS", "React", "Angular"};
+        return options[random.nextInt(options.length)];
     }
 
 
