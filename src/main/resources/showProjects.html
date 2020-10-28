@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Projects</title>
+</head>
+<body>
+<h1>Show Projects</h1>
+<div id="projects"></div>
+
+</body>
+<script>
+    const project = document.getElementById("projects");
+    fetch("/api/project").then(resp => resp.text()).then(html => project.innerHTML = html);
+</script>
+
+</html>
