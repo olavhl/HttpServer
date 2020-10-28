@@ -1,7 +1,6 @@
 package no.kristiania.database;
 
 import javax.sql.DataSource;
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +34,7 @@ public class ProjectDao {
 
     private Project mapRowToProject(ResultSet rs) throws SQLException {
         Project project = new Project();
+        project.setId(rs.getInt("id"));
         project.setName(rs.getString("name"));
         return project;
     }
@@ -63,7 +63,18 @@ public class ProjectDao {
     }
 
 
-    public ProjectDao retrieve(Integer id) {
-        return null;
+    public Project retrieve(Integer id) throws SQLException {
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM projects WHERE id = ?")) {
+                statement.setInt(1, id);
+                try (ResultSet rs = statement.executeQuery()) {
+                    if (rs.next()) {
+                        return mapRowToProject(rs);
+                    } else {
+                        return null;
+                    }
+                }
+            }
+        }
     }
 }
