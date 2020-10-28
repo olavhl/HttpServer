@@ -52,6 +52,7 @@ public class ProjectDaoTest {
                 .isEqualTo(project);
     }
 
+
     private Project exampleProject() {
         Project project = new Project();
         project.setName(exampleProjectName());
