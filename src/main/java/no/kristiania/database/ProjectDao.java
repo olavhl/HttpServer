@@ -63,4 +63,7 @@ public class ProjectDao {
     }
 
 
+    public ProjectDao retrieve(Integer id) {
+        return null;
+    }
 }
