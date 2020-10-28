@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 
+import java.sql.SQLException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProjectDaoTest {
@@ -23,10 +25,14 @@ public class ProjectDaoTest {
 
 
     @Test
-    void shouldListAllProjects(){
+    void shouldListAllProjects() throws SQLException {
 
         Project project1 = exampleProject();
         Project project2 = exampleProject();
+
+        projectDao.insert(project1);
+        projectDao.insert(project2);
+
         assertThat(projectDao.list()).extracting(Project::getName).contains(project1.getName(), project2.getName());
 
     }
@@ -41,8 +47,6 @@ public class ProjectDaoTest {
 
         return null;
     }
-
-
 
 
 }
