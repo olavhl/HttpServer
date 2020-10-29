@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class HttpMessage {
 
-    private final String startLine;
+    private String startLine;
     private final String body;
     private final Map<String, String> headers;
 
@@ -22,6 +22,11 @@ public class HttpMessage {
         } else {
             body = null;
         }
+    }
+
+    public HttpMessage() {
+        headers = new HashMap<>();
+        this.body = null;
     }
 
     public HttpMessage(String body) {
@@ -73,7 +78,9 @@ public class HttpMessage {
         return body;
     }
 
-
+    public void setStartLine(String startLine) {
+        this.startLine = startLine;
+    }
 
     static String readBody(Socket socket, int contentLength) throws IOException {
         StringBuilder body = new StringBuilder();
@@ -90,6 +97,8 @@ public class HttpMessage {
             clientSocket.getOutputStream().write((headerName + ": " + headers.get(headerName) + "\r\n").getBytes());
         }
         clientSocket.getOutputStream().write(("\r\n").getBytes());
-        clientSocket.getOutputStream().write(body.getBytes());
+        if (body != null) {
+            clientSocket.getOutputStream().write(body.getBytes());
+        }
     }
 }

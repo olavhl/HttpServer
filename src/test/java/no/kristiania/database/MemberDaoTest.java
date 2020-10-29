@@ -81,9 +81,16 @@ public class MemberDaoTest {
         projectDao.insert(project);
 
         String body = "memberId=" + member.getId() + "&projectId=" + project.getId();
-        controller.handle(new HttpMessage(body), null);
+
+        HttpMessage response = controller.handle(new HttpMessage(body));
+
         assertThat(memberDao.retrieve(member.getId()).getProjectId())
                 .isEqualTo(project.getId());
+
+        assertThat(response.getStartLine())
+                .isEqualTo("HTTP/1.1 302 Redirect");
+        assertThat(response.getHeaders().get("Location"))
+                .isEqualTo("http://localhost:8080/index.html");
     }
 
     private static String exampleFirstName() {
