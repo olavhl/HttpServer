@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Change project status</title>
+</head>
+<body>
+<h2>Change project status</h2>
+
+<form method="post" action="/api/changeProjectStatus">
+    <p>Project: <select name="projectId" id="projectId"></select></p>
+    <p>Status:
+        <select name="status" id="status">
+            <option>Not started</option>
+            <option>Ongoing</option>
+            <option>Done</option>
+        </select></p>
+    <button>Sumbit</button>
+</form>
+
+</body>
+<script>
+    fetch("/api/projectOption").then(resp => resp.text()).then(html => {
+        document.getElementById("projectId").innerHTML = html;
+    })
+</script>
+</html>

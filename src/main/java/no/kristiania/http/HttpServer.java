@@ -22,9 +22,9 @@ public class HttpServer {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpServer.class);
 
-    private Map<String, HttpController> controllers;
-    private MemberDao memberDao;
-    private ServerSocket serverSocket;
+    private final Map<String, HttpController> controllers;
+    private final MemberDao memberDao;
+    private final ServerSocket serverSocket;
 
 
     public HttpServer(int port, DataSource dataSource) throws IOException {
@@ -32,10 +32,11 @@ public class HttpServer {
         ProjectDao projectDao = new ProjectDao(dataSource);
         controllers = Map.of(
                 "/api/newProject", new ProjectPostController(projectDao),
-                "/api/project", new ProjectGetController(projectDao),
+                "/api/project", new ProjectGetController(projectDao, memberDao),
                 "/api/projectOption", new ProjectOptionController(projectDao),
                 "/api/memberOption", new MemberOptionController(memberDao),
-                "/api/updateProject", new UpdateMemberController(memberDao)
+                "/api/updateProject", new UpdateMemberController(memberDao),
+                "/api/changeProjectStatus", new ChangeProjectStatusController(projectDao)
         );
 
         serverSocket = new ServerSocket(port);

@@ -28,6 +28,18 @@ public class ProjectDao extends AbstractDao<Project> {
 
     }
 
+    public void update(Project project) throws SQLException {
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE projects SET status = ? WHERE id = ?"
+            )) {
+                statement.setString(1, project.getStatus());
+                statement.setInt(2, project.getId());
+                statement.executeUpdate();
+            }
+        }
+    }
+
     @Override
     protected Project mapRow(ResultSet rs) throws SQLException {
         Project project = new Project();
