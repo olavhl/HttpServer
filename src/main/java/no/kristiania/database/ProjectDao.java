@@ -33,6 +33,7 @@ public class ProjectDao extends AbstractDao<Project> {
         Project project = new Project();
         project.setId(rs.getInt("id"));
         project.setName(rs.getString("name"));
+        project.setStatus(rs.getString("status"));
         return project;
     }
 
@@ -41,11 +42,12 @@ public class ProjectDao extends AbstractDao<Project> {
 
         try (Connection connection = dataSource.getConnection()){
             try (PreparedStatement statement = connection.prepareStatement(
-                    "INSERT INTO projects (name) values (?)",
+                    "INSERT INTO projects (name, status) values (?, ?)",
                     Statement.RETURN_GENERATED_KEYS
             )){
 
                 statement.setString(1,project.getName());
+                statement.setString(2, project.getStatus());
                 statement.executeUpdate();
 
                 try (ResultSet generatedKeys = statement.getGeneratedKeys()) {

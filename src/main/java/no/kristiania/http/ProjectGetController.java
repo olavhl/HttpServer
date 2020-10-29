@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 public class ProjectGetController implements HttpController {
 
-    private ProjectDao projectDao;
+    private final ProjectDao projectDao;
 
     public ProjectGetController(ProjectDao projectDao) {
         this.projectDao = projectDao;
@@ -19,9 +19,8 @@ public class ProjectGetController implements HttpController {
     public void handle(HttpMessage request, Socket clientSocket) throws IOException, SQLException {
         String body = "<ul>";
         for (Project project : projectDao.list()) {
-            body += "<li>" + project.getName() + "</li>";
+            body += "<li>" + project.getName() + " (status: " + project.getStatus() + ")" + "</li>";
         }
-
         body += "</ul>";
 
 

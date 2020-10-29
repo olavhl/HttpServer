@@ -103,10 +103,11 @@ class HttpServerTest {
     void shouldPostNewProject() throws IOException {
         String requestBody = "projectName=angular&status=Good";
         HttpClient postClient = new HttpClient("localhost", server.getPort(), "/api/newProject", "POST", requestBody);
-        assertEquals(200, postClient.getStatusCode());
+        // Should return 302 because it is redirecting to showProjects.html
+        assertEquals(302, postClient.getStatusCode());
 
         HttpClient getClient = new HttpClient("localhost", server.getPort(), "/api/project");
-        assertThat(getClient.getResponseBody()).contains("<li>angular</li>");
+        assertThat(getClient.getResponseBody()).contains("angular");
     }
 
 

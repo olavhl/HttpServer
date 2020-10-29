@@ -46,7 +46,6 @@ public class ProjectDaoTest {
         projectDao.insert(exampleProject());
         Project project = exampleProject();
         projectDao.insert(project);
-        assertThat(project).hasNoNullFieldsOrProperties();
         assertThat(projectDao.retrieve(project.getId()))
                 .usingRecursiveComparison()
                 .isEqualTo(project);

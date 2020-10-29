@@ -20,14 +20,12 @@ public class ProjectPostController implements HttpController{
 
         Project project = new Project();
         project.setName(requestParameter.getParameter("projectName"));
+        project.setStatus(requestParameter.getParameter("status"));
         projectDao.insert(project);
 
-        String body = "Okay";
-        String response = "HTTP/1.1 200 OK \r\n" +
-                "Content-Length: " + body.length() + "\r\n" +
-                "Connection: close\r\n" +
-                "\r\n" +
-                body;
+        String response = "HTTP/1.1 302 Redirect \r\n" +
+                "Location: http://localhost:8080/showProjects.html\r\n" +
+                "\r\n";
 
         clientSocket.getOutputStream().write(response.getBytes());
     }
