@@ -1,0 +1,26 @@
+@startuml
+
+entity Members {
+    id
+    --
+    first_name
+    last_name
+    email
+
+    project_id
+}
+
+entity projects {
+    id
+    --
+    name
+    status
+
+    member_id
+}
+
+
+Members |o--o| projects
+
+
+@enduml
