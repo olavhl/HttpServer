@@ -12,7 +12,7 @@ import java.sql.SQLException;
 public class ProjectGetController implements HttpController {
 
     private final ProjectDao projectDao;
-    private MemberDao memberDao;
+    private final MemberDao memberDao;
 
     public ProjectGetController(ProjectDao projectDao, MemberDao memberDao) {
         this.memberDao = memberDao;

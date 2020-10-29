@@ -1,6 +1,8 @@
 package no.kristiania.database;
 
+import no.kristiania.http.ChangeProjectStatusController;
 import no.kristiania.http.ProjectOptionController;
+import no.kristiania.http.QueryString;
 import org.flywaydb.core.Flyway;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +13,7 @@ import java.sql.SQLException;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ProjectDaoTest {
 
@@ -60,7 +63,6 @@ public class ProjectDaoTest {
         assertThat(controller.getBody()).contains("<option value=" +
                 project.getId() + ">" + project.getName() + "</option>");
     }
-
 
 
     public static Project exampleProject() {

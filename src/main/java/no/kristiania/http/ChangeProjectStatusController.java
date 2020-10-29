@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.sql.SQLException;
 
 public class ChangeProjectStatusController implements HttpController {
-    private final ProjectDao projectDao;
+    private static ProjectDao projectDao;
 
     public ChangeProjectStatusController(ProjectDao projectDao) {
         this.projectDao = projectDao;
@@ -24,6 +24,16 @@ public class ChangeProjectStatusController implements HttpController {
     public HttpMessage handle(HttpMessage request) throws SQLException {
         QueryString requestParameter = new QueryString(request.getBody());
 
+        changeStatus(requestParameter);
+
+        HttpMessage redirect = new HttpMessage();
+        redirect.setStartLine("HTTP/1.1 302 Redirect");
+        redirect.getHeaders().put("Location", "http://localhost:8080/index.html");
+        return redirect;
+
+    }
+
+    public static void changeStatus(QueryString requestParameter) throws SQLException {
         Integer projectId = Integer.valueOf(requestParameter.getParameter("projectId"));
         String projectStatus = String.valueOf(requestParameter.getParameter("status"));
         Project project = projectDao.retrieve(projectId);
@@ -31,11 +41,5 @@ public class ChangeProjectStatusController implements HttpController {
         project.setStatus(projectStatus);
 
         projectDao.update(project);
-
-        HttpMessage redirect = new HttpMessage();
-        redirect.setStartLine("HTTP/1.1 302 Redirect");
-        redirect.getHeaders().put("Location", "http://localhost:8080/index.html");
-        return redirect;
-
     }
 }
