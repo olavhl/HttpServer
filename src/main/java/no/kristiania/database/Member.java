@@ -1,14 +1,22 @@
 package no.kristiania.database;
 
 public class Member {
-    public int id;
     private  String firstName, lastName, email;
+    private Integer id, projectId;
 
-    public int getId() {
+    public Integer getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Integer projectId) {
+        this.projectId = projectId;
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

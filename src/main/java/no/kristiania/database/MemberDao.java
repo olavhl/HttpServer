@@ -13,10 +13,23 @@ public class MemberDao extends AbstractDao<Member>{
         super(dataSource);
     }
 
+    public void update(Member member) throws SQLException {
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE members SET project_id = ? WHERE id = ?"
+            )) {
+                statement.setInt(1, member.getProjectId());
+                statement.setInt(2, member.getId());
+                statement.executeUpdate();
+            }
+        }
+    }
+
     @Override
     protected Member mapRow(ResultSet rs) throws SQLException {
         Member member = new Member();
         member.setId(rs.getInt("id"));
+        member.setProjectId((Integer) rs.getObject("project_id"));
         member.setFirstName(rs.getString("first_name"));
         member.setLastName(rs.getString("last_name"));
         member.setEmail(rs.getString("email"));
@@ -70,7 +83,7 @@ public class MemberDao extends AbstractDao<Member>{
         }
     }
 
-    public Member retrieve(int id) throws SQLException {
+    public Member retrieve(Integer id) throws SQLException {
         return  retrieve(id, "SELECT * FROM members WHERE id = ?");
     }
 

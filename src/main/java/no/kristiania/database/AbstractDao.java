@@ -13,7 +13,7 @@ public abstract class AbstractDao<T> {
         this.dataSource = dataSource;
     }
 
-    protected T retrieve(int id, String sql) throws SQLException {
+    protected T retrieve(Integer id, String sql) throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, id);

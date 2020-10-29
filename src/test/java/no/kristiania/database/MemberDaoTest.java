@@ -1,12 +1,14 @@
 package no.kristiania.database;
 
+import no.kristiania.http.HttpMessage;
 import no.kristiania.http.MemberOptionController;
+import no.kristiania.http.UpdateMemberController;
 import org.flywaydb.core.Flyway;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.sql.DataSource;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Random;
 
@@ -16,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MemberDaoTest {
 
     private MemberDao memberDao;
+    private ProjectDao projectDao;
     private static Random random = new Random();
 
     @BeforeEach
@@ -25,6 +28,7 @@ public class MemberDaoTest {
         Flyway.configure().dataSource(dataSource).load().migrate();
 
         memberDao = new MemberDao(dataSource);
+        projectDao = new ProjectDao(dataSource);
     }
 
 
@@ -38,12 +42,12 @@ public class MemberDaoTest {
     }
 
     @Test
-    void shouldRetrieveAllProductProperties() throws SQLException {
+    void shouldRetrieveAllMemberProperties() throws SQLException {
         memberDao.insert(exampleMember());
         memberDao.insert(exampleMember());
         Member member = exampleMember();
         memberDao.insert(member);
-        assertThat(member).hasNoNullFieldsOrProperties();
+        assertThat(member).hasNoNullFieldsOrPropertiesExcept("projectId");
         assertThat(memberDao.retrieve(member.getId())).usingRecursiveComparison().isEqualTo(member);
     }
 
@@ -64,6 +68,22 @@ public class MemberDaoTest {
         member.setLastName(exampleLastName());
         member.setEmail(exampleEmail());
         return member;
+    }
+
+    @Test
+    void shouldUpdateExistingMemberWithNewProject() throws SQLException, IOException {
+        UpdateMemberController controller = new UpdateMemberController(memberDao);
+
+        Member member = exampleMember();
+        memberDao.insert(member);
+
+        Project project = ProjectDaoTest.exampleProject();
+        projectDao.insert(project);
+
+        String body = "memberId=" + member.getId() + "&projectId=" + project.getId();
+        controller.handle(new HttpMessage(body), null);
+        assertThat(memberDao.retrieve(member.getId()).getProjectId())
+                .isEqualTo(project.getId());
     }
 
     private static String exampleFirstName() {

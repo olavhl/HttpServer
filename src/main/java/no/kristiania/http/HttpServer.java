@@ -32,7 +32,8 @@ public class HttpServer {
                 "/api/newProject", new ProjectPostController(projectDao),
                 "/api/project", new ProjectGetController(projectDao),
                 "/api/projectOption", new ProjectOptionController(projectDao),
-            "/api/memberOption", new MemberOptionController(memberDao)
+                "/api/memberOption", new MemberOptionController(memberDao),
+                "/api/updateProject", new UpdateMemberController(memberDao)
         );
 
         serverSocket = new ServerSocket(port);
