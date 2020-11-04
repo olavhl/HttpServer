@@ -36,34 +36,7 @@ public class MemberDao extends AbstractDao<Member>{
         return member;
     }
 
-    public static void main(String[] args) throws SQLException {
-        PGSimpleDataSource dataSource = new PGSimpleDataSource();
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/projectmember");
-        dataSource.setUser("projectmember");
-        dataSource.setPassword("pojewojrwjrep");
 
-        MemberDao memberDao = new MemberDao(dataSource);
-
-        System.out.println("Please enter first name:");
-        Scanner scannerFirstName = new Scanner(System.in);
-        String firstName = scannerFirstName.nextLine();
-
-        Scanner scannerLastName = new Scanner(System.in);
-        String lastName = scannerLastName.nextLine();
-
-        Scanner scannerEmail = new Scanner(System.in);
-        String email = scannerEmail.nextLine();
-
-        Member members = new Member();
-        members.setFirstName(firstName);
-        members.setLastName(lastName);
-        members.setEmail(email);
-        memberDao.insert(members);
-
-        for (Member member : memberDao.list()) {
-            System.out.println(member);
-        }
-    }
 
 
     public void insert(Member member) throws SQLException {

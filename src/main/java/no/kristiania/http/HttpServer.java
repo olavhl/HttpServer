@@ -98,6 +98,11 @@ public class HttpServer {
                handleEchoRequest(clientSocket, requestTarget, questionPos);
            } else if (requestPath.equals("/api/member")) {
                handleGetMembers(clientSocket);
+           } else if (requestPath.equals("/")){
+               String response = "HTTP/1.1 302 Redirect\r\n" +
+                       "Location: http://localhost:8080/index.html \r\n" +
+                       "\r\n";
+               clientSocket.getOutputStream().write(response.getBytes());
            } else {
                HttpController controller = controllers.get(requestPath);
                if (controller != null) {

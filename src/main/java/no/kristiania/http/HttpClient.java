@@ -42,13 +42,6 @@ public class HttpClient {
         statusCode = Integer.parseInt(responseLineParts[1]);
     }
 
-    public static void main(String[] args) throws IOException {
-        String hostname = "urlecho.appspot.com";
-        int port = 80;
-        String requestTarget = "/echo?status&body=Hello%20World!";
-
-        new HttpClient(hostname, port, requestTarget);
-    }
 
 
     public int getStatusCode() {
