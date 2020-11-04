@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="project-output"></div>
+</body>
+<script>
+    fetch("/api/showMemberAndStatusProject").then(resp => resp.text()).then(html => {
+        document.getElementById("project-output").innerHTML = html;
+    })
+</script>
+</html>
