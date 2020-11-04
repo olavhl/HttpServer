@@ -35,7 +35,7 @@ public class HttpServer {
 
         new Thread(() -> {
              while (true) {
-                try (Socket clientSocket = serverSocket.accept();) {
+                try (Socket clientSocket = serverSocket.accept()) {
                       handleRequest(clientSocket);
                 } catch (IOException | SQLException e) {
                         e.printStackTrace();
