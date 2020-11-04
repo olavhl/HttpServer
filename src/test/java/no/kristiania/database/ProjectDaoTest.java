@@ -1,5 +1,8 @@
 package no.kristiania.database;
 
+import no.kristiania.http.ChangeProjectStatusController;
+import no.kristiania.http.ProjectOptionController;
+import no.kristiania.http.QueryString;
 import org.flywaydb.core.Flyway;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,11 +13,12 @@ import java.sql.SQLException;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ProjectDaoTest {
 
     private ProjectDao projectDao;
-    private Random random = new Random();
+    private static Random random = new Random();
 
     @BeforeEach
     void setUp() {
@@ -40,25 +44,34 @@ public class ProjectDaoTest {
     }
 
     @Test
-
     void shouldRetrieveAllProjectProperties() throws SQLException {
         projectDao.insert(exampleProject());
         projectDao.insert(exampleProject());
         Project project = exampleProject();
         projectDao.insert(project);
-        assertThat(project).hasNoNullFieldsOrProperties();
         assertThat(projectDao.retrieve(project.getId()))
                 .usingRecursiveComparison()
                 .isEqualTo(project);
     }
 
-    private Project exampleProject() {
+    @Test
+    void shouldReturnProjectsAsOptions() throws SQLException {
+        ProjectOptionController controller = new ProjectOptionController(projectDao);
+        Project project = exampleProject();
+        projectDao.insert(project);
+
+        assertThat(controller.getBody()).contains("<option value=" +
+                project.getId() + ">" + project.getName() + "</option>");
+    }
+
+
+    public static Project exampleProject() {
         Project project = new Project();
         project.setName(exampleProjectName());
         return project;
     }
 
-    private String exampleProjectName() {
+    private static String exampleProjectName() {
         String[] options = {"Java", "Javascript", "HTML/CSS", "React", "Angular"};
         return options[random.nextInt(options.length)];
     }

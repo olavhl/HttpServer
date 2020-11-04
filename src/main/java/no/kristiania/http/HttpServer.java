@@ -11,6 +11,8 @@ import javax.sql.DataSource;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -20,18 +22,25 @@ public class HttpServer {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpServer.class);
 
-    private Map<String, HttpController> controllers;
-    private MemberDao memberDao;
+    private final Map<String, HttpController> controllers;
+    private final MemberDao memberDao;
+    private final ServerSocket serverSocket;
+
 
     public HttpServer(int port, DataSource dataSource) throws IOException {
         memberDao = new MemberDao(dataSource);
         ProjectDao projectDao = new ProjectDao(dataSource);
         controllers = Map.of(
                 "/api/newProject", new ProjectPostController(projectDao),
-                "/api/project", new ProjectGetController(projectDao)
+                "/api/project", new ProjectGetController(projectDao, memberDao),
+                "/api/projectOption", new ProjectOptionController(projectDao),
+                "/api/memberOption", new MemberOptionController(memberDao),
+                "/api/updateProject", new UpdateMemberController(memberDao),
+                "/api/changeProjectStatus", new ChangeProjectStatusController(projectDao),
+                "/api/showMemberAndStatusProject", new ShowMemberAndStatusProjectController(memberDao, projectDao)
         );
 
-        ServerSocket serverSocket = new ServerSocket(port);
+        serverSocket = new ServerSocket(port);
 
         new Thread(() -> {
              while (true) {
@@ -68,9 +77,9 @@ public class HttpServer {
 
     private void handleRequest(Socket clientSocket) throws IOException, SQLException {
 
-        HttpMessage request = new HttpMessage(clientSocket);
-        String requestLine = request.getStartLine();
-        System.out.println(requestLine);
+       HttpMessage request = new HttpMessage(clientSocket);
+       String requestLine = request.getStartLine();
+       System.out.println(requestLine);
 
        String requestMethod = requestLine.split(" ")[0];
        String requestTarget = requestLine.split(" ")[1];
@@ -79,7 +88,7 @@ public class HttpServer {
        String requestPath = questionPos != -1 ? requestTarget.substring(0, questionPos) : requestTarget;
 
        if (requestMethod.equals("POST")){
-           if (requestPath.equals("/api/members")) {
+           if (requestPath.equals("/api/member")) {
                handlePostProject(clientSocket, request);
            } else {
                getController(requestPath).handle(request, clientSocket);
@@ -87,7 +96,7 @@ public class HttpServer {
        } else {
            if (requestPath.equals("/echo")) {
                handleEchoRequest(clientSocket, requestTarget, questionPos);
-           } else if (requestPath.equals("/api/members")) {
+           } else if (requestPath.equals("/api/member")) {
                handleGetMembers(clientSocket);
            } else {
                HttpController controller = controllers.get(requestPath);
@@ -112,12 +121,9 @@ public class HttpServer {
 
         memberDao.insert(member);
 
-        String body = "Okay";
-        String response = "HTTP/1.1 200 OK\r\n" +
-                "Content-Length: " + body.length() + "\r\n" +
-                "Connection: close\r\n" +
-                "\r\n" +
-                body;
+        String response = "HTTP/1.1 302 Redirect\r\n" +
+                "Location: http://localhost:8080/showMembers.html \r\n" +
+                "\r\n";
 
         clientSocket.getOutputStream().write(response.getBytes());
     }
@@ -190,10 +196,12 @@ public class HttpServer {
     private void handleGetMembers(Socket clientSocket) throws IOException, SQLException {
         String body = "<ul>";
         for (Member member : memberDao.list()) {
-            body += "<li>" + member.getFirstName() + " " + member.getLastName() +  " (" + member.getEmail() + ")" + "</li>";
+            body += "<li>" + member.getFirstName() + " " + member.getLastName()
+                    +  " (" + member.getEmail() + ")" + "</li>";
         }
         body += "</ul>";
 
+        body = decodeValue(body);
         String response = "HTTP/1.1 200 OK\r\n" +
                 "Content-Length: " + body.length() + "\r\n" +
                 "Content-Type: text/html\r\n" +
@@ -206,5 +214,17 @@ public class HttpServer {
 
     public List<Member> getMemberNames() throws SQLException {
         return memberDao.list();
+    }
+
+    public int getPort() {
+        return serverSocket.getLocalPort();
+    }
+
+    public static String decodeValue(String str) {
+        try {
+            return URLDecoder.decode(str, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex.getCause());
+        }
     }
 }
