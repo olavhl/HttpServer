@@ -3,9 +3,25 @@
 # HttpServer
 
 This is a small HttpServer that is reading files and answering requests.
-The project is done for an assignment at Høyskolen Kristiania.
+The project is done for our examn at Høyskolen Kristiania.
+
+To start of the project you need to implement your own file called pgr203.properties with this structure:
+dataSource.url= ...
+dataSource.username= ...
+dataSource.password= ...
+
+Use your own database, username and password to use this program.
 
 Start the server by running the main method in httpServer ->
-Type localhost:8080/index.html in your URL. You could also do the previous and run the program by using the debugger as well as write the command: java -jar target/httpserver-1.0-SNAPSHOT.jar in your terminal or commandline.
-After starting the server you can navigate between the different files by editing the URL from localhost:8080/index.html to see a plain.txt at localhost:8080/plain.txt, or even show the stylesheet by writing localhost:8080/style.css.
+Type localhost:8080/index.html in your URL, or click the link that appears in your console. You could also do the previous and run the program by using the debugger as well as write the command: java -jar target/httpserver-1.0-SNAPSHOT.jar in your terminal or commandline.
 
+When you launch the program you will be able to add and display members. You can also add projects, assign projectstatus and add members to your project.
+There is also a function to change status of a project. If you'd like to you can filter your projects according to member and status.
+
+
+
+
+
+
+##Database-uml
+![Database UML](docs/database_structure.png)
