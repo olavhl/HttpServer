@@ -8,32 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class MemberDao extends AbstractDao<Member>{
+public class MemberDao {
+
+    private final DataSource dataSource;
+
     public MemberDao(DataSource dataSource) {
-        super(dataSource);
-    }
-
-    public void update(Member member) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(
-                    "UPDATE members SET project_id = ? WHERE id = ?"
-            )) {
-                statement.setInt(1, member.getProjectId());
-                statement.setInt(2, member.getId());
-                statement.executeUpdate();
-            }
-        }
-    }
-
-    @Override
-    protected Member mapRow(ResultSet rs) throws SQLException {
-        Member member = new Member();
-        member.setId(rs.getInt("id"));
-        member.setProjectId((Integer) rs.getObject("project_id"));
-        member.setFirstName(rs.getString("first_name"));
-        member.setLastName(rs.getString("last_name"));
-        member.setEmail(rs.getString("email"));
-        return member;
+        this.dataSource = dataSource;
+        
     }
 
     public static void main(String[] args) throws SQLException {
@@ -77,14 +58,34 @@ public class MemberDao extends AbstractDao<Member>{
                 statement.executeUpdate();
                 try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                     generatedKeys.next();
-                    member.setId(generatedKeys.getInt("id"));
+                    member.setId(generatedKeys.getLong("id"));
                 }
             }
         }
     }
 
-    public Member retrieve(Integer id) throws SQLException {
-        return  retrieve(id, "SELECT * FROM members WHERE id = ?");
+    public Member retrieve(Long id) throws SQLException {
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement("select * from members where id = ?")) {
+                statement.setLong(1, id);
+                try (ResultSet rs = statement.executeQuery()) {
+                    if (rs.next()) {
+                        return setPropertiesToMember(rs);
+                    } else {
+                        return null;
+                    }
+                }
+            }
+        }
+    }
+
+    private Member setPropertiesToMember(ResultSet rs) throws SQLException {
+        Member member = new Member();
+        member.setId(rs.getLong("id"));
+        member.setFirstName(rs.getString("first_name"));
+        member.setLastName(rs.getString("last_name"));
+        member.setEmail(rs.getString("email"));
+        return member;
     }
 
     public List<Member> list() throws SQLException {
@@ -93,7 +94,7 @@ public class MemberDao extends AbstractDao<Member>{
             try (PreparedStatement statement = connection.prepareStatement("select * from members")) {
                 try (ResultSet rs = statement.executeQuery()) {
                     while(rs.next()) {
-                        members.add(mapRow(rs));
+                        members.add(setPropertiesToMember(rs));
                     }
                     return members;
                 }

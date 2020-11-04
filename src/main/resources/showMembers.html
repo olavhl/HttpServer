@@ -8,14 +8,10 @@
     <h1>Members</h1>
     <div id="member"></div>
 
-
-    <ul>
-        <li><a href= "/index.html">Home</a></li>
-    </ul>
 </body>
 <script>
     const member = document.getElementById("member");
-    fetch("/api/member").then(resp => resp.text()).then(html => member.innerHTML = html);
+    fetch("/api/members").then(resp => resp.text()).then(html => member.innerHTML = html);
 </script>
 
 </html>

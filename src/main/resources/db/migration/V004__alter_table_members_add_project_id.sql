@@ -1,1 +1,0 @@
-alter table members add column project_id integer null references projects(id);

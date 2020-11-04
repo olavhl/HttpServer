@@ -5,10 +5,14 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProjectDao extends AbstractDao<Project> {
+public class ProjectDao {
+
+    private DataSource dataSource;
 
     public ProjectDao(DataSource dataSource){
-        super(dataSource);
+
+        this.dataSource = dataSource;
+
     }
     public List<Project> list() throws SQLException {
 
@@ -18,7 +22,7 @@ public class ProjectDao extends AbstractDao<Project> {
                 try (ResultSet rs = statement.executeQuery()){
                     List<Project> members = new ArrayList<>();
                     while (rs.next()){
-                        members.add(mapRow(rs));
+                        members.add(mapRowToProject(rs));
                     }
                     return members;
                 }
@@ -28,24 +32,10 @@ public class ProjectDao extends AbstractDao<Project> {
 
     }
 
-    public void update(Project project) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(
-                    "UPDATE projects SET status = ? WHERE id = ?"
-            )) {
-                statement.setString(1, project.getStatus());
-                statement.setInt(2, project.getId());
-                statement.executeUpdate();
-            }
-        }
-    }
-
-    @Override
-    protected Project mapRow(ResultSet rs) throws SQLException {
+    private Project mapRowToProject(ResultSet rs) throws SQLException {
         Project project = new Project();
         project.setId(rs.getInt("id"));
         project.setName(rs.getString("name"));
-        project.setStatus(rs.getString("status"));
         return project;
     }
 
@@ -54,24 +44,37 @@ public class ProjectDao extends AbstractDao<Project> {
 
         try (Connection connection = dataSource.getConnection()){
             try (PreparedStatement statement = connection.prepareStatement(
-                    "INSERT INTO projects (name, status) values (?, ?)",
+                    "INSERT INTO projects (name) values (?)",
                     Statement.RETURN_GENERATED_KEYS
             )){
 
                 statement.setString(1,project.getName());
-                statement.setString(2, project.getStatus());
                 statement.executeUpdate();
 
-                try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                try (ResultSet generatedKeys = statement.getGeneratedKeys()){
                     generatedKeys.next();
                     project.setId(generatedKeys.getInt("id"));
                 }
+
+
+
             }
         }
     }
 
 
     public Project retrieve(Integer id) throws SQLException {
-        return retrieve(id, "SELECT * FROM projects WHERE id = ?");
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM projects WHERE id = ?")) {
+                statement.setInt(1, id);
+                try (ResultSet rs = statement.executeQuery()) {
+                    if (rs.next()) {
+                        return mapRowToProject(rs);
+                    } else {
+                        return null;
+                    }
+                }
+            }
+        }
     }
 }

@@ -1,8 +1,5 @@
 package no.kristiania.http;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -37,5 +34,4 @@ public class QueryString {
         }
         return result.toString();
     }
-
 }

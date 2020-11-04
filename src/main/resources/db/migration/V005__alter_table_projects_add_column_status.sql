@@ -1,1 +1,0 @@
-alter table projects add column status varchar;
