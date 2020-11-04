@@ -98,6 +98,8 @@ public class HttpServer {
                handleEchoRequest(clientSocket, requestTarget, questionPos);
            } else if (requestPath.equals("/api/member")) {
                handleGetMembers(clientSocket);
+
+           // Redirecting if http://localhost:8080/ to index.html
            } else if (requestPath.equals("/")){
                String response = "HTTP/1.1 302 Redirect\r\n" +
                        "Location: http://localhost:8080/index.html \r\n" +
