@@ -1,6 +1,6 @@
 @startuml
 
-entity Members {
+entity Member {
     id
     --
     first_name
@@ -10,17 +10,24 @@ entity Members {
     project_id
 }
 
-entity projects {
+entity Project {
     id
     --
     name
-    status
+    projectstatus_id
 
     member_id
 }
 
+entity ProjectStatus {
+    id
+    --
+    name
+}
 
-Members |o--o| projects
+
+Project |o--o{ Member
+ProjectStatus ||--o{ Project
 
 
 @enduml
