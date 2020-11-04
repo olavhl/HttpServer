@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class HttpMessage {
 
-    private final String startLine;
+    private String startLine;
     private final String body;
     private final Map<String, String> headers;
 
@@ -22,6 +22,19 @@ public class HttpMessage {
         } else {
             body = null;
         }
+    }
+
+    public HttpMessage() {
+        headers = new HashMap<>();
+        this.body = null;
+    }
+
+    public HttpMessage(String body) {
+        startLine = "HTTP/1.1 200 OK";
+        headers = new HashMap<>();
+        headers.put("Content-Length", String.valueOf(body.length()));
+        headers.put("Connection", "close");
+        this.body = body;
     }
 
     public static String readLine(Socket socket) throws IOException {
@@ -65,6 +78,9 @@ public class HttpMessage {
         return body;
     }
 
+    public void setStartLine(String startLine) {
+        this.startLine = startLine;
+    }
 
     static String readBody(Socket socket, int contentLength) throws IOException {
         StringBuilder body = new StringBuilder();
@@ -73,5 +89,16 @@ public class HttpMessage {
             body.append((char)socket.getInputStream().read());
         }
         return body.toString();
+    }
+
+    public void write(Socket clientSocket) throws IOException {
+        clientSocket.getOutputStream().write((startLine + "\r\n").getBytes());
+        for (String headerName : headers.keySet()) {
+            clientSocket.getOutputStream().write((headerName + ": " + headers.get(headerName) + "\r\n").getBytes());
+        }
+        clientSocket.getOutputStream().write(("\r\n").getBytes());
+        if (body != null) {
+            clientSocket.getOutputStream().write(body.getBytes());
+        }
     }
 }

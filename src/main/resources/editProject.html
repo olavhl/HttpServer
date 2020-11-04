@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit project</title>
+</head>
+<body>
+<h2>Edit project</h2>
+
+<form method="post" action="/api/updateProject">
+    <p>Member: <select name="memberId" id="memberId"></select></p>
+    <p>Project: <select name="projectId" id="projectId"></select></p>
+    <button>Sumbit</button>
+</form>
+
+<ul>
+    <li><a href= "/index.html">Home</a></li>
+</ul>
+</body>
+
+<script>
+    fetch("/api/memberOption").then(resp => resp.text()).then(html => {
+        document.getElementById("memberId").innerHTML = html;
+    });
+    fetch("/api/projectOption").then(resp => resp.text()).then(html => {
+        document.getElementById("projectId").innerHTML = html;
+    })
+
+</script>
+
+</html>

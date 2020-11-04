@@ -9,28 +9,35 @@ import java.io.IOException;
 import java.net.Socket;
 import java.sql.SQLException;
 
-public class ProjectGetController implements HttpController {
-
-    private final ProjectDao projectDao;
+public class ShowMemberAndStatusProjectController implements HttpController {
     private final MemberDao memberDao;
+    private final ProjectDao projectDao;
 
-    public ProjectGetController(ProjectDao projectDao, MemberDao memberDao) {
+    public ShowMemberAndStatusProjectController(MemberDao memberDao, ProjectDao projectDao) {
         this.memberDao = memberDao;
         this.projectDao = projectDao;
     }
 
     @Override
     public void handle(HttpMessage request, Socket clientSocket) throws IOException, SQLException {
-        String body = "<ul>";
-        for (Project project : projectDao.list()) {
-            body += "<br><li>" + project.getName() + " (status: " + project.getStatus() + ")" + "</li>";
+        QueryString requestParameter = new QueryString(request.getBody());
 
-            for (Member member : memberDao.list()) {
-                if (project.getId().equals(member.getProjectId())) {
-                    body += "<li style=padding-left:1em>" + member.getFirstName() + " " + member.getLastName() + "</li>";
-                }
+        Integer memberId = Integer.valueOf(requestParameter.getParameter("memberId"));
+        String status = String.valueOf(requestParameter.getParameter("status"));
+        Member member = memberDao.retrieve(memberId);
+
+        String body = "<ul>";
+
+        for (Project project : projectDao.list()) {
+            if (project.getId().equals(member.getId()) && project.getStatus().equals(status)) {
+                body += "<li>" + project.getName() + " (" + project.getStatus() + ")</li>";
             }
         }
+
+        if (body.length() < 5) {
+            body += "<li>No projects with this member and status</li>";
+        }
+
         body += "</ul>";
 
         String response = "HTTP/1.1 200 OK \r\n" +
@@ -42,4 +49,5 @@ public class ProjectGetController implements HttpController {
 
         clientSocket.getOutputStream().write(response.getBytes());
     }
+
 }
