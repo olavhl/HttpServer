@@ -101,10 +101,7 @@ public class HttpServer {
 
            // Redirecting if http://localhost:8080/ to index.html
            } else if (requestPath.equals("/")){
-               String response = "HTTP/1.1 302 Redirect\r\n" +
-                       "Location: http://localhost:8080/index.html \r\n" +
-                       "\r\n";
-               clientSocket.getOutputStream().write(response.getBytes());
+               handleRedirect(clientSocket);
            } else {
                HttpController controller = controllers.get(requestPath);
                if (controller != null) {
@@ -112,10 +109,15 @@ public class HttpServer {
                } else {
                    handleFileRequest(clientSocket, requestPath);
                }
-
-               logger.info("See members at http://localhost:{}/showMembers.html", 8080);
            }
        }
+    }
+
+    private void handleRedirect(Socket clientSocket) throws IOException {
+        String response = "HTTP/1.1 302 Redirect\r\n" +
+                "Location: http://localhost:8080/index.html \r\n" +
+                "\r\n";
+        clientSocket.getOutputStream().write(response.getBytes());
     }
 
     private void handlePostProject(Socket clientSocket, HttpMessage request) throws SQLException, IOException {
@@ -128,11 +130,7 @@ public class HttpServer {
 
         memberDao.insert(member);
 
-        String response = "HTTP/1.1 302 Redirect\r\n" +
-                "Location: http://localhost:8080/showMembers.html \r\n" +
-                "\r\n";
-
-        clientSocket.getOutputStream().write(response.getBytes());
+        handleRedirect(clientSocket);
     }
 
     private HttpController getController(String requestPath) {
