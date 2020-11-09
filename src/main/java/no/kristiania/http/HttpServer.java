@@ -69,7 +69,6 @@ public class HttpServer {
         logger.info("Using database {}", dataSource.getUrl());
         Flyway.configure().dataSource(dataSource).load().migrate();
 
-
         HttpServer server = new HttpServer(8080, dataSource);
         logger.info("Started on http://localhost:{}/index.html", 8080);
 
@@ -100,7 +99,7 @@ public class HttpServer {
                handleGetMembers(clientSocket);
 
            // Redirecting if http://localhost:8080/ to index.html
-           } else if (requestPath.equals("/")){
+           } else if (requestPath.equals("/") || requestPath.startsWith("/db") || requestPath.startsWith("/no")){
                handleRedirect(clientSocket);
            } else {
                HttpController controller = controllers.get(requestPath);
