@@ -30,6 +30,7 @@ In addition:
 * Video of pairprogramming
 * Automatic reports for our tests in Github Actions
 * Good use of DAO pattern and Controller pattern.
+* Favicon.ico
 
 
 ### Video of pair programmering
