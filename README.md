@@ -25,6 +25,7 @@ Our project has consistent code, names, and follow standard Java-conventions. Th
 
 In addition:
 * Handling request target "/"
+* Edit project
 * UML-diagram
 * URL-decoding for Norwegian letters
 * Video of pairprogramming
