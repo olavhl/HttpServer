@@ -15,6 +15,8 @@ public class QueryString {
             int equalsPos = parameter.indexOf("=");
             String key = parameter.substring(0, equalsPos);
             String value = parameter.substring(equalsPos + 1);
+            key = decodeValue(key);
+            value = decodeValue(value);
             this.parameters.put(key, value);
         }
     }
@@ -36,6 +38,14 @@ public class QueryString {
             result.append(parameter.getKey()).append("=").append(parameter.getValue());
         }
         return result.toString();
+    }
+
+    public static String decodeValue(String str) {
+        try {
+            return URLDecoder.decode(str, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex.getCause());
+        }
     }
 
 }

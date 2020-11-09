@@ -11,8 +11,6 @@ import javax.sql.DataSource;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -205,7 +203,6 @@ public class HttpServer {
         }
         body += "</ul>";
 
-        body = decodeValue(body);
         String response = "HTTP/1.1 200 OK\r\n" +
                 "Content-Length: " + body.length() + "\r\n" +
                 "Content-Type: text/html\r\n" +
@@ -224,11 +221,5 @@ public class HttpServer {
         return serverSocket.getLocalPort();
     }
 
-    public static String decodeValue(String str) {
-        try {
-            return URLDecoder.decode(str, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex.getCause());
-        }
-    }
+
 }
