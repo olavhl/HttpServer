@@ -19,7 +19,8 @@ When you launch the program you will be able to add and display members. You can
 There is also a function to change status of a project. If you'd like to you can filter your projects according to member and status.
 
 
-
+##Video fra parprogrammering
+https://youtu.be/Vz7Qzl-Y1H8
 
 
 
